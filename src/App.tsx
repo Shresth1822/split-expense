@@ -17,6 +17,7 @@ function Dashboard() {
 }
 
 import { Groups } from "./pages/groups/Groups";
+import { GroupDetails } from "./pages/groups/GroupDetails";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
               <Route element={<AppLayout />}>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/groups" element={<Groups />} />
+                <Route path="/groups/:id" element={<GroupDetails />} />
               </Route>
             </Route>
           </Routes>
