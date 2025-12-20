@@ -8,16 +8,10 @@ import { Register } from "./pages/auth/Register";
 
 const queryClient = new QueryClient();
 
-function Dashboard() {
-  return (
-    <div>
-      <h1>Dashboard Placeholder</h1>
-    </div>
-  );
-}
-
+import { Dashboard } from "./pages/Dashboard";
 import { Groups } from "./pages/groups/Groups";
 import { GroupDetails } from "./pages/groups/GroupDetails";
+import { Friends } from "./pages/friends/Friends";
 
 function App() {
   return (
@@ -33,6 +27,7 @@ function App() {
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/groups" element={<Groups />} />
                 <Route path="/groups/:id" element={<GroupDetails />} />
+                <Route path="/friends" element={<Friends />} />
               </Route>
             </Route>
           </Routes>

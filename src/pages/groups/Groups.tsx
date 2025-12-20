@@ -22,6 +22,7 @@ export function Groups() {
   const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
+  const [createError, setCreateError] = useState("");
 
   const { data: groups, isLoading } = useQuery({
     queryKey: ["groups"],
@@ -73,10 +74,15 @@ export function Groups() {
       setIsCreating(false);
       setNewGroupName("");
     },
+    onError: (error) => {
+      console.error("Failed to create group:", error);
+      setCreateError(error.message || "Failed to create group");
+    },
   });
 
   const handleCreateGroup = (e: React.FormEvent) => {
     e.preventDefault();
+    setCreateError("");
     if (!newGroupName.trim()) return;
     createGroup.mutate(newGroupName);
   };
@@ -114,13 +120,21 @@ export function Groups() {
                     onChange={(e) => setNewGroupName(e.target.value)}
                   />
                 </div>
+                {createError && (
+                  <div className="text-sm font-medium text-destructive">
+                    {createError}
+                  </div>
+                )}
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
               <Button
                 variant="ghost"
                 type="button"
-                onClick={() => setIsCreating(false)}
+                onClick={() => {
+                  setIsCreating(false);
+                  setCreateError("");
+                }}
               >
                 Cancel
               </Button>
