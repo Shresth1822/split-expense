@@ -3,6 +3,7 @@ import { LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { Button } from "../ui/button";
+import { ModeToggle } from "../ui/mode-toggle";
 
 export function AppLayout() {
   const { signOut, user } = useAuth();
@@ -59,9 +60,20 @@ export function AppLayout() {
           </nav>
 
           <div className="border-t p-4">
-            <div className="mb-4 flex items-center gap-3 px-2">
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
-                {user?.email?.[0].toUpperCase()}
+            <Link
+              to="/profile"
+              className="mb-4 flex items-center gap-3 px-2 hover:bg-accent rounded-md p-2 transition-colors cursor-pointer"
+            >
+              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium overflow-hidden">
+                {user?.user_metadata?.avatar_url ? (
+                  <img
+                    src={user.user_metadata.avatar_url}
+                    alt="Avatar"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span>{user?.email?.[0].toUpperCase()}</span>
+                )}
               </div>
               <div className="overflow-hidden">
                 <p className="truncate text-sm font-medium">
@@ -71,15 +83,18 @@ export function AppLayout() {
                   {user?.email}
                 </p>
               </div>
+            </Link>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-2"
+                onClick={() => signOut()}
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
+              <ModeToggle />
             </div>
-            <Button
-              variant="outline"
-              className="w-full justify-start gap-2"
-              onClick={() => signOut()}
-            >
-              <LogOut className="h-4 w-4" />
-              Sign Out
-            </Button>
           </div>
         </div>
       </aside>

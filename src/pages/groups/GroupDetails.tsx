@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, UserPlus } from "lucide-react";
+import { ArrowLeft, UserPlus, MessageSquare } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Group, GroupMember, Profile } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AddExpense } from "@/components/expenses/AddExpense";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { ExpenseComments } from "@/components/expenses/ExpenseComments";
 
 type GroupDetails = Group & {
   group_members: (GroupMember & {
@@ -145,8 +154,35 @@ export function GroupDetails() {
                           {new Date(expense.date).toLocaleDateString()}
                         </p>
                       </div>
-                      <div className="font-bold text-lg">
-                        ₹{expense.amount.toFixed(2)}
+                      <div className="flex items-center gap-4">
+                        <div className="font-bold text-lg">
+                          ₹{expense.amount.toFixed(2)}
+                        </div>
+
+                        <Sheet>
+                          <SheetTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                            >
+                              <MessageSquare className="h-4 w-4" />
+                              <span className="sr-only">Comments</span>
+                            </Button>
+                          </SheetTrigger>
+                          <SheetContent>
+                            <SheetHeader>
+                              <SheetTitle>Comments</SheetTitle>
+                              <SheetDescription>
+                                Discuss details for{" "}
+                                <strong>{expense.description}</strong>
+                              </SheetDescription>
+                            </SheetHeader>
+                            <div className="mt-4 h-[calc(100vh-10rem)]">
+                              <ExpenseComments expenseId={expense.id} />
+                            </div>
+                          </SheetContent>
+                        </Sheet>
                       </div>
                     </div>
                   ))}

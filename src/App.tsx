@@ -5,6 +5,7 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AppLayout } from "./components/layout/AppLayout";
 import { Login } from "./pages/auth/Login";
 import { Register } from "./pages/auth/Register";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 
 const queryClient = new QueryClient();
 
@@ -14,28 +15,32 @@ import { Dashboard } from "./pages/Dashboard";
 import { Groups } from "./pages/groups/Groups";
 import { GroupDetails } from "./pages/groups/GroupDetails";
 import { Friends } from "./pages/friends/Friends";
+import { Profile } from "./pages/settings/Profile";
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-            <Route element={<ProtectedRoute />}>
-              <Route element={<AppLayout />}>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/groups" element={<Groups />} />
-                <Route path="/groups/:id" element={<GroupDetails />} />
-                <Route path="/friends" element={<Friends />} />
+              <Route element={<ProtectedRoute />}>
+                <Route element={<AppLayout />}>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/groups" element={<Groups />} />
+                  <Route path="/groups/:id" element={<GroupDetails />} />
+                  <Route path="/friends" element={<Friends />} />
+                  <Route path="/profile" element={<Profile />} />
+                </Route>
               </Route>
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-      <Toaster />
+            </Routes>
+          </BrowserRouter>
+          <Toaster />
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
