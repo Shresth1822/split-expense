@@ -17,6 +17,13 @@ import { GroupDetails } from "./pages/groups/GroupDetails";
 import { Friends } from "./pages/friends/Friends";
 import { Profile } from "./pages/settings/Profile";
 
+import { Features } from "./pages/static/Features";
+import { HowItWorks } from "./pages/static/HowItWorks";
+import { FAQ } from "./pages/static/FAQ";
+import { PrivacyPolicy } from "./pages/static/PrivacyPolicy";
+import { TermsOfService } from "./pages/static/TermsOfService";
+import { CookiePolicy } from "./pages/static/CookiePolicy";
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -34,6 +41,14 @@ function App() {
                   <Route path="/groups/:id" element={<GroupDetails />} />
                   <Route path="/friends" element={<Friends />} />
                   <Route path="/profile" element={<Profile />} />
+
+                  {/* Static Pages */}
+                  <Route path="/features" element={<Features />} />
+                  <Route path="/how-it-works" element={<HowItWorks />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<TermsOfService />} />
+                  <Route path="/cookie-policy" element={<CookiePolicy />} />
                 </Route>
               </Route>
             </Routes>

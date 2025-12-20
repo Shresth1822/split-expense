@@ -1,19 +1,22 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, UserPlus, MessageSquare } from "lucide-react";
+import {
+  ArrowLeft,
+  UserPlus,
+  MessageSquare,
+  Receipt,
+  Calendar,
+  Users,
+  MoreHorizontal,
+  Settings,
+} from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Group, GroupMember, Profile } from "@/types";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
 import { AddExpense } from "@/components/expenses/AddExpense";
 import {
   Sheet,
@@ -24,6 +27,14 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ExpenseComments } from "@/components/expenses/ExpenseComments";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type GroupDetails = Group & {
   group_members: (GroupMember & {
@@ -71,12 +82,6 @@ export function GroupDetails() {
 
   const addMember = useMutation({
     mutationFn: async (email: string) => {
-      // 1. Find user by email (Simplified: requires specific Supabase setup or edge function usually,
-      // but for this demo we'll try to find in profiles directly if RLS allows,
-      // OR we just rely on the user existing in auth. In a real app, this is an invitation flow.)
-
-      // NOTE: Querying profiles by email might be RLS restricted.
-      // For this "Resume Project", we will assume we can find the profile ID from the public profiles table.
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("id")
@@ -113,107 +118,209 @@ export function GroupDetails() {
   };
 
   if (isLoading)
-    return <div className="p-8 text-center">Loading group details...</div>;
-  if (!group) return <div className="p-8 text-center">Group not found</div>;
+    return (
+      <div className="p-8 text-center text-muted-foreground">
+        Loading group details...
+      </div>
+    );
+  if (!group)
+    return (
+      <div className="p-8 text-center text-muted-foreground">
+        Group not found
+      </div>
+    );
+
+  const totalExpenses =
+    group.expenses?.reduce((sum, exp) => sum + exp.amount, 0) || 0;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link to="/groups">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{group.name}</h1>
-          <p className="text-muted-foreground">
-            {group.group_members.length} members
-          </p>
+    <div className="space-y-8">
+      {/* Header / Hero */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <Link
+            to="/groups"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <div className="flex items-center gap-1 text-sm font-medium">
+              <ArrowLeft className="h-4 w-4" /> Back to Groups
+            </div>
+          </Link>
+        </div>
+
+        <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 p-8 text-white shadow-2xl">
+          <div className="relative z-10 flex flex-col md:flex-row justify-between md:items-end gap-6">
+            <div>
+              <Badge
+                variant="secondary"
+                className="mb-2 bg-white/20 hover:bg-white/30 text-white border-0"
+              >
+                {group.group_members.length} Members
+              </Badge>
+              <h1 className="text-4xl font-bold tracking-tight mb-2">
+                {group.name}
+              </h1>
+              <div className="flex items-center gap-2 text-violet-100">
+                <Calendar className="h-4 w-4" />
+                <span className="text-sm">
+                  Created {new Date(group.created_at).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-violet-100 font-medium mb-1">Total Expenses</p>
+              <h2 className="text-4xl font-bold tracking-tight">
+                ₹{totalExpenses.toFixed(2)}
+              </h2>
+            </div>
+          </div>
+          {/* Abstract Background Shapes */}
+          <div className="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 -ml-16 -mb-16 h-64 w-64 rounded-full bg-black/10 blur-3xl"></div>
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-[2fr_1fr]">
+      <div className="grid gap-8 md:grid-cols-[1fr_300px]">
+        {/* Main Content: Expenses */}
         <div className="space-y-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Expenses</CardTitle>
-              <AddExpense groupId={id!} members={group.group_members} />
-            </CardHeader>
-            <CardContent>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold flex items-center gap-2">
+              <Receipt className="h-5 w-5" /> Expenses
+            </h3>
+            <AddExpense groupId={id!} members={group.group_members} />
+          </div>
+
+          <Card className="bg-card/50 border-0 shadow-none">
+            <CardContent className="p-0">
               {group.expenses && group.expenses.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {group.expenses.map((expense) => (
                     <div
                       key={expense.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border bg-card hover:border-primary/50 transition-all duration-200 shadow-sm"
                     >
-                      <div className="space-y-1">
-                        <p className="font-medium">{expense.description}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Paid by {expense.profiles?.full_name || "Unknown"} •{" "}
-                          {new Date(expense.date).toLocaleDateString()}
-                        </p>
-                      </div>
                       <div className="flex items-center gap-4">
-                        <div className="font-bold text-lg">
-                          ₹{expense.amount.toFixed(2)}
+                        <div className="h-12 w-12 rounded-xl bg-primary/10 flex flex-col items-center justify-center text-primary border border-primary/20">
+                          <span className="text-xs font-bold uppercase">
+                            {new Date(expense.date).toLocaleString("default", {
+                              month: "short",
+                            })}
+                          </span>
+                          <span className="text-lg font-bold leading-none">
+                            {new Date(expense.date).getDate()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-base">
+                            {expense.description}
+                          </p>
+                          <p className="text-sm text-muted-foreground flex items-center gap-1">
+                            <span className="font-medium text-foreground/80">
+                              {expense.profiles?.full_name?.split(" ")[0] ||
+                                "Unknown"}
+                            </span>{" "}
+                            paid
+                            <span className="font-bold text-foreground mx-1">
+                              ₹{expense.amount.toFixed(2)}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between sm:justify-end gap-4 mt-3 sm:mt-0 w-full sm:w-auto">
+                        <div className="text-right hidden sm:block">
+                          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider block">
+                            Total
+                          </span>
                         </div>
 
-                        <Sheet>
-                          <SheetTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                            >
-                              <MessageSquare className="h-4 w-4" />
-                              <span className="sr-only">Comments</span>
-                            </Button>
-                          </SheetTrigger>
-                          <SheetContent>
-                            <SheetHeader>
-                              <SheetTitle>Comments</SheetTitle>
-                              <SheetDescription>
-                                Discuss details for{" "}
-                                <strong>{expense.description}</strong>
-                              </SheetDescription>
-                            </SheetHeader>
-                            <div className="mt-4 h-[calc(100vh-10rem)]">
-                              <ExpenseComments expenseId={expense.id} />
-                            </div>
-                          </SheetContent>
-                        </Sheet>
+                        <div className="flex items-center gap-2">
+                          <Sheet>
+                            <SheetTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-9 w-9 p-0 rounded-full hover:bg-primary/10 hover:text-primary transition-colors"
+                              >
+                                <MessageSquare className="h-4 w-4" />
+                                <span className="sr-only">Comments</span>
+                              </Button>
+                            </SheetTrigger>
+                            <SheetContent>
+                              <SheetHeader>
+                                <SheetTitle>Comments</SheetTitle>
+                                <SheetDescription>
+                                  Discuss details for{" "}
+                                  <strong>{expense.description}</strong>
+                                </SheetDescription>
+                              </SheetHeader>
+                              <div className="mt-4 h-[calc(100vh-10rem)]">
+                                <ExpenseComments expenseId={expense.id} />
+                              </div>
+                            </SheetContent>
+                          </Sheet>
+
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-9 w-9 p-0 rounded-full"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem>Edit Expense</DropdownMenuItem>
+                              <DropdownMenuItem className="text-destructive">
+                                Delete Expense
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center text-muted-foreground py-8 border rounded-lg border-dashed">
-                  No expenses yet. Add one to get started!
+                <div className="text-center py-20 bg-card/30 rounded-xl border border-dashed">
+                  <Receipt className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                  <h3 className="text-lg font-medium">No expenses yet</h3>
+                  <p className="text-muted-foreground text-sm mt-1">
+                    Add an expense to start tracking group spending.
+                  </p>
                 </div>
               )}
             </CardContent>
           </Card>
         </div>
 
+        {/* Sidebar: Members */}
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Members</CardTitle>
-              <CardDescription>Manage who is in this group</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold flex items-center gap-2">
+              <Users className="h-5 w-5" /> Members
+            </h3>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <Card className="bg-card/50 shadow-sm border-0">
+            <CardContent className="p-4 space-y-6">
+              <div className="space-y-3">
                 {group.group_members.map((member) => (
                   <div
                     key={member.user_id}
-                    className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50"
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-card transition-colors"
                   >
-                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-medium">
-                      {member.profiles.full_name?.[0] ||
-                        member.profiles.email?.[0]}
-                    </div>
-                    <div className="overflow-hidden">
+                    <Avatar className="h-10 w-10 border-2 border-background">
+                      <AvatarImage src={member.profiles.avatar_url || ""} />
+                      <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                        {member.profiles.full_name?.[0] || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 overflow-hidden">
                       <p className="text-sm font-medium truncate">
                         {member.profiles.full_name || "User"}
                       </p>
@@ -225,14 +332,15 @@ export function GroupDetails() {
                 ))}
               </div>
 
-              <div className="border-t pt-4">
+              <div className="pt-4 border-t">
+                <h4 className="text-sm font-medium mb-3">Add Member</h4>
                 <form onSubmit={handleInvite} className="space-y-2">
-                  <Label>Add Member by Email</Label>
                   <div className="flex gap-2">
                     <Input
-                      placeholder="email@example.com"
+                      placeholder="Email address"
                       value={inviteEmail}
                       onChange={(e) => setInviteEmail(e.target.value)}
+                      className="bg-background"
                     />
                     <Button
                       type="submit"
@@ -243,7 +351,9 @@ export function GroupDetails() {
                     </Button>
                   </div>
                   {inviteError && (
-                    <p className="text-xs text-destructive">{inviteError}</p>
+                    <p className="text-xs text-destructive mt-1">
+                      {inviteError}
+                    </p>
                   )}
                 </form>
               </div>

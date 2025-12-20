@@ -6,14 +6,6 @@ import * as z from "zod";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
 const registerSchema = z.object({
@@ -62,22 +54,55 @@ export function Register() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>
-            Enter your information to start splitting expenses
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
+    <div className="w-full h-screen lg:grid lg:grid-cols-2">
+      {/* Left Side - Hero/Branding */}
+      <div className="hidden lg:flex flex-col justify-between p-10 bg-zinc-900 text-white relative overflow-hidden">
+        {/* Abstract Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-black z-0" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent z-0" />
+
+        {/* Content */}
+        <div className="relative z-10 flex items-center gap-2">
+          <span className="bg-primary text-primary-foreground p-1 rounded-md">
+            <span className="font-bold text-lg leading-none flex items-center justify-center w-5 h-5">
+              $
+            </span>
+          </span>
+          <span className="text-xl font-bold">SplitExpense</span>
+        </div>
+
+        <div className="relative z-10">
+          <h1 className="text-4xl font-bold tracking-tight mb-4">
+            Start splitting bills the smart way.
+          </h1>
+          <p className="text-lg text-zinc-400">
+            Create an account to track detailed expenses, manage groups, and
+            settle debts effortlessly.
+          </p>
+        </div>
+
+        <div className="relative z-10 text-sm text-zinc-500">
+          &copy; 2025 SplitExpense. All rights reserved.
+        </div>
+      </div>
+
+      {/* Right Side - Form */}
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background">
+        <div className="mx-auto grid w-[350px] gap-6">
+          <div className="grid gap-2 text-center">
+            <h1 className="text-3xl font-bold">Create an account</h1>
+            <p className="text-balance text-muted-foreground">
+              Enter your information to get started
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             {error && (
               <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
                 {error}
               </div>
             )}
-            <div className="space-y-2">
+            <div className="grid gap-2">
               <Label htmlFor="fullName">Full Name</Label>
               <Input
                 id="fullName"
@@ -90,7 +115,7 @@ export function Register() {
                 </p>
               )}
             </div>
-            <div className="space-y-2">
+            <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -104,7 +129,7 @@ export function Register() {
                 </p>
               )}
             </div>
-            <div className="space-y-2">
+            <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" {...register("password")} />
               {errors.password && (
@@ -113,20 +138,18 @@ export function Register() {
                 </p>
               )}
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-4">
-            <Button className="w-full" type="submit" disabled={isLoading}>
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Creating account..." : "Create account"}
             </Button>
-            <div className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <Link to="/login" className="text-primary hover:underline">
-                Sign in
-              </Link>
-            </div>
-          </CardFooter>
-        </form>
-      </Card>
+          </form>
+          <div className="mt-4 text-center text-sm">
+            Already have an account?{" "}
+            <Link to="/login" className="underline">
+              Sign in
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

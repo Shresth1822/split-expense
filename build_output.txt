@@ -1,0 +1,7 @@
+﻿
+> split-expense@0.0.0 build
+> tsc && vite build
+
+src/pages/groups/GroupDetails.tsx(20,3): error TS6133: 'CardHeader' is declared but its value is never read.
+src/pages/groups/GroupDetails.tsx(21,3): error TS6133: 'CardTitle' is declared but its value is never read.
+src/pages/groups/GroupDetails.tsx(22,3): error TS6133: 'CardDescription' is declared but its value is never read.
