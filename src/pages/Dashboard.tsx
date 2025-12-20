@@ -10,13 +10,17 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { SettleDebt } from "@/components/settlement/SettleDebt";
+
+import { useRecentActivity } from "@/hooks/useRecentActivity";
 
 export function Dashboard() {
   const { user } = useAuth();
   const { data: balances, isLoading: loadingBalances } = useBalances();
   const { data: debts, isLoading: loadingDebts } = useDebtBreakdown();
+  const { data: activity, isLoading: loadingActivity } = useRecentActivity();
 
-  const isLoading = loadingBalances || loadingDebts;
+  const isLoading = loadingBalances || loadingDebts || loadingActivity;
 
   if (isLoading) {
     return <div className="p-8">Loading dashboard...</div>;
@@ -90,15 +94,36 @@ export function Dashboard() {
               <Accordion type="single" collapsible className="w-full">
                 {debts.map((debt) => (
                   <AccordionItem key={debt.owedTo.id} value={debt.owedTo.id}>
-                    <AccordionTrigger className="hover:no-underline">
-                      <div className="flex justify-between w-full pr-4">
-                        <span>{debt.owedTo.full_name || "User"}</span>
-                        <span className="text-red-500 font-bold">
-                          ₹{debt.totalAmount.toFixed(2)}
-                        </span>
+                    <AccordionTrigger className="hover:no-underline px-2">
+                      <div className="flex justify-between w-full pr-4 items-center">
+                        <div className="flex gap-4 items-center">
+                          <span>{debt.owedTo.full_name || "User"}</span>
+                          {debt.totalAmount > 0 && debt.commonGroupId && (
+                            <SettleDebt
+                              owedToId={debt.owedTo.id}
+                              owedToName={debt.owedTo.full_name || "User"}
+                              amount={debt.totalAmount}
+                              groupId={debt.commonGroupId}
+                            />
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <span
+                            className={`font-bold block ${
+                              debt.totalAmount > 0
+                                ? "text-red-500"
+                                : "text-green-500"
+                            }`}
+                          >
+                            ₹{Math.abs(debt.totalAmount).toFixed(2)}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {debt.totalAmount > 0 ? "you owe" : "owes you"}
+                          </span>
+                        </div>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent>
+                    <AccordionContent className="px-2">
                       <div className="space-y-2 pt-2">
                         {debt.expenses.map((expense) => (
                           <div
@@ -109,7 +134,13 @@ export function Dashboard() {
                               {expense.description} (
                               {new Date(expense.date).toLocaleDateString()})
                             </span>
-                            <span>₹{expense.amount.toFixed(2)}</span>
+                            <span
+                              className={
+                                expense.amount < 0 ? "text-green-600" : ""
+                              }
+                            >
+                              ₹{expense.amount.toFixed(2)}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -130,7 +161,36 @@ export function Dashboard() {
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">No recent activity.</p>
+            {activity && activity.length > 0 ? (
+              <div className="space-y-4">
+                {activity.map((item: any) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0"
+                  >
+                    <div>
+                      <p className="font-medium text-sm">{item.description}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.profiles?.full_name} added in{" "}
+                        {item.groups?.name || "Group"}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-bold text-sm">
+                        ₹{item.amount.toFixed(2)}
+                      </span>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(item.date).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No recent activity.
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -15,6 +15,7 @@ export interface DebtItem {
     date: string;
     amount: number;
   }[];
+  commonGroupId?: string;
 }
 
 export function useDebtBreakdown() {
@@ -26,50 +27,83 @@ export function useDebtBreakdown() {
     queryFn: async () => {
       if (!user) return [];
 
-      // Fetch all splits where I owe money (user_id = ME, owed_to != ME)
+      // Fetch ALL splits involving me (either paying or owing)
       const { data, error } = await supabase
         .from("expense_splits")
         .select(
           `
           amount,
+          user_id,
           owed_to,
           profiles:owed_to (id, full_name, email),
-          expenses (id, description, date)
+          payer_profile:user_id (id, full_name, email),
+          expenses (id, description, date, group_id)
         `
         )
-        .eq("user_id", user.id)
-        .neq("owed_to", user.id);
+        .or(`user_id.eq.${user.id},owed_to.eq.${user.id}`);
 
       if (error) throw error;
 
-      // Group by 'owed_to' user
-      const groupedDebts: Record<string, DebtItem> = {};
+      // Group by "The Other Person"
+      const personBalances: Record<string, DebtItem> = {};
 
       data?.forEach((split: any) => {
-        const owedToId = split.owed_to;
-        const profile = split.profiles;
-        const expense = split.expenses;
+        // Determine who is the "other" person in this transaction
+        const isIOwe = split.user_id === user.id;
+        const otherId = isIOwe ? split.owed_to : split.user_id;
 
-        if (!groupedDebts[owedToId]) {
-          groupedDebts[owedToId] = {
-            owedTo: profile,
+        // Skip self-loops if they exist
+        if (split.user_id === split.owed_to) return;
+
+        if (!personBalances[otherId]) {
+          const profile = isIOwe ? split.profiles : split.payer_profile;
+          personBalances[otherId] = {
+            owedTo: profile, // This is now "The Other Person"
             totalAmount: 0,
             expenses: [],
+            commonGroupId: undefined,
           };
         }
 
-        groupedDebts[owedToId].totalAmount += Number(split.amount);
-        if (expense) {
-          groupedDebts[owedToId].expenses.push({
-            id: expense.id,
-            description: expense.description,
-            date: expense.date,
-            amount: Number(split.amount), // The amount I owe for THIS expense
-          });
+        // Calculate Net Impact on ME
+        // If I owe (user_id = ME), amount is ADDED to my debt.
+        // If I am owed (owed_to = ME), amount is SUBTRACTED from my debt.
+        const amount = Number(split.amount);
+        if (isIOwe) {
+          personBalances[otherId].totalAmount += amount;
+          // Add detail: This is a debt
+          if (split.expenses) {
+            if (
+              !personBalances[otherId].commonGroupId &&
+              split.expenses.group_id
+            ) {
+              personBalances[otherId].commonGroupId = split.expenses.group_id;
+            }
+            personBalances[otherId].expenses.push({
+              id: split.expenses.id,
+              description: split.expenses.description,
+              date: split.expenses.date,
+              amount: amount,
+            });
+          }
+        } else {
+          personBalances[otherId].totalAmount -= amount;
+          // Add detail: This is a payment/credit (Negative debt)
+          if (split.expenses) {
+            personBalances[otherId].expenses.push({
+              id: split.expenses.id,
+              description: `Paid by me: ${split.expenses.description}`,
+              date: split.expenses.date,
+              amount: -amount,
+            });
+          }
         }
       });
 
-      return Object.values(groupedDebts);
+      // Return ALL non-settled balances (either I owe or I am owed)
+      return Object.values(personBalances).filter(
+        (item) => Math.abs(item.totalAmount) > 0.01
+      );
     },
   });
 }

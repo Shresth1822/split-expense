@@ -8,6 +8,8 @@ import { Register } from "./pages/auth/Register";
 
 const queryClient = new QueryClient();
 
+import { Toaster } from "@/components/ui/sonner";
+
 import { Dashboard } from "./pages/Dashboard";
 import { Groups } from "./pages/groups/Groups";
 import { GroupDetails } from "./pages/groups/GroupDetails";
@@ -33,6 +35,7 @@ function App() {
           </Routes>
         </BrowserRouter>
       </AuthProvider>
+      <Toaster />
     </QueryClientProvider>
   );
 }
