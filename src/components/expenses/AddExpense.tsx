@@ -246,7 +246,7 @@ export function AddExpense({ groupId, members }: AddExpenseProps) {
                     <Input
                       type="number"
                       placeholder={
-                        watch("splitType") === "percentage" ? "%" : "$"
+                        watch("splitType") === "percentage" ? "%" : "₹"
                       }
                       className="col-span-3 h-8"
                       step="0.01"

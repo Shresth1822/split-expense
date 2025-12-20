@@ -146,7 +146,7 @@ export function GroupDetails() {
                         </p>
                       </div>
                       <div className="font-bold text-lg">
-                        ${expense.amount.toFixed(2)}
+                        ₹{expense.amount.toFixed(2)}
                       </div>
                     </div>
                   ))}
