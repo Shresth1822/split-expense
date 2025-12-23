@@ -10,6 +10,7 @@ import {
   Users,
   MoreHorizontal,
   Settings,
+  Plus,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Group, GroupMember, Profile } from "@/types";
@@ -17,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
+import { useFriends } from "@/hooks/useFriends";
 import { AddExpense } from "@/components/expenses/AddExpense";
 import {
   Sheet,
@@ -50,6 +52,8 @@ export function GroupDetails() {
   const queryClient = useQueryClient();
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteError, setInviteError] = useState("");
+
+  const { data: friends } = useFriends();
 
   const { data: group, isLoading } = useQuery({
     queryKey: ["group", id],
@@ -117,6 +121,26 @@ export function GroupDetails() {
     addMember.mutate(inviteEmail);
   };
 
+  const deleteExpense = useMutation({
+    mutationFn: async (expenseId: string) => {
+      const { error } = await supabase
+        .from("expenses")
+        .delete()
+        .eq("id", expenseId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["group", id] });
+      queryClient.invalidateQueries({ queryKey: ["balances"] });
+      queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
+      queryClient.invalidateQueries({ queryKey: ["debts"] });
+    },
+    onError: (error) => {
+      console.error("Failed to delete expense:", error);
+      alert("Failed to delete expense. You might not have permission.");
+    },
+  });
+
   if (isLoading)
     return (
       <div className="p-8 text-center text-muted-foreground">
@@ -132,6 +156,11 @@ export function GroupDetails() {
 
   const totalExpenses =
     group.expenses?.reduce((sum, exp) => sum + exp.amount, 0) || 0;
+
+  const availableFriends = friends?.filter(
+    (friend) =>
+      !group.group_members.some((member) => member.user_id === friend.id)
+  );
 
   return (
     <div className="space-y-8">
@@ -271,8 +300,13 @@ export function GroupDetails() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>Edit Expense</DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive">
+                              <DropdownMenuItem disabled>
+                                Edit Expense
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-destructive focus:text-destructive cursor-pointer"
+                                onClick={() => deleteExpense.mutate(expense.id)}
+                              >
                                 Delete Expense
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -356,6 +390,47 @@ export function GroupDetails() {
                     </p>
                   )}
                 </form>
+
+                {availableFriends && availableFriends.length > 0 && (
+                  <div className="mt-6 pt-4 border-t">
+                    <h4 className="text-sm font-medium mb-3 text-muted-foreground">
+                      Add from Friends
+                    </h4>
+                    <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                      {availableFriends.map((friend) => (
+                        <div
+                          key={friend.id}
+                          className="flex items-center justify-between p-2 rounded-lg bg-card/50 border hover:bg-card transition-colors"
+                        >
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src={friend.avatar_url || ""} />
+                              <AvatarFallback className="text-[10px]">
+                                {friend.full_name?.[0] || "F"}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm truncate">
+                              {friend.full_name || friend.email}
+                            </span>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 w-7 p-0"
+                            onClick={() => {
+                              if (friend.email) {
+                                addMember.mutate(friend.email);
+                              }
+                            }}
+                            disabled={addMember.isPending}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
