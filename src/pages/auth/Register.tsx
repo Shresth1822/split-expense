@@ -129,7 +129,7 @@ export function Register() {
               $
             </span>
           </span>
-          <span className="text-xl font-bold">SplitExpense</span>
+          <span className="text-xl font-bold">Splitify</span>
         </div>
 
         <div className="relative z-10">
@@ -143,7 +143,7 @@ export function Register() {
         </div>
 
         <div className="relative z-10 text-sm text-zinc-500">
-          &copy; 2025 SplitExpense. All rights reserved.
+          &copy; 2025 Splitify. All rights reserved.
         </div>
       </div>
 

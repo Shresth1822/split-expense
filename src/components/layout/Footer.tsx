@@ -11,7 +11,7 @@ export function Footer() {
               <span className="bg-primary text-primary-foreground p-1 rounded-md">
                 <span className="font-bold text-lg">$</span>
               </span>
-              <span className="text-xl font-bold">SplitExpense</span>
+              <span className="text-xl font-bold">Splitify</span>
             </div>
             <p className="text-sm text-muted-foreground">
               The modern way to split bills and manage shared expenses with
@@ -22,6 +22,7 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Product</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
+              {/* ... links ... */}
               <li>
                 <Link
                   to="/features"
@@ -82,7 +83,7 @@ export function Footer() {
 
         <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2025 SplitExpense. All rights reserved.
+            © 2025 Splitify. All rights reserved.
           </p>
           <div className="flex gap-4">
             <a

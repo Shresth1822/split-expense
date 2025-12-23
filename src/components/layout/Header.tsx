@@ -41,7 +41,7 @@ export function Header() {
               </span>
             </span>
             <span className="text-xl font-bold hidden sm:inline-block">
-              SplitExpense
+              Splitify
             </span>
           </Link>
         </div>

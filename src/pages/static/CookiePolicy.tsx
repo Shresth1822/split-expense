@@ -11,8 +11,8 @@ export function CookiePolicy() {
           <div className="prose dark:prose-invert space-y-4">
             <p className="text-muted-foreground">Last updated: December 2025</p>
             <p>
-              This is the Cookie Policy for SplitExpense, accessible from
-              splitexpense.com.
+              This is the Cookie Policy for Splitify, accessible from
+              splitify.space.
             </p>
             <h3 className="text-xl font-bold">What Are Cookies</h3>
             <p>

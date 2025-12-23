@@ -11,7 +11,7 @@ export function PrivacyPolicy() {
           <div className="prose dark:prose-invert space-y-4">
             <p className="text-muted-foreground">Last updated: December 2025</p>
             <p>
-              Your privacy is important to us. It is SplitExpense's policy to
+              Your privacy is important to us. It is Splitify's policy to
               respect your privacy regarding any information we may collect from
               you across our website.
             </p>
@@ -24,7 +24,7 @@ export function PrivacyPolicy() {
             <h3 className="text-xl font-bold">How We Use Information</h3>
             <p>
               We use the information we collect to operate and maintain our
-              SplitExpense service, including authenticating you, managing your
+              Splitify service, including authenticating you, managing your
               groups and expenses, and improving our application.
             </p>
           </div>

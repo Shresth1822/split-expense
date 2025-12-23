@@ -18,7 +18,7 @@ export function FAQ() {
             <AccordionItem value="item-1">
               <AccordionTrigger>Is SplitExpense free?</AccordionTrigger>
               <AccordionContent>
-                Yes! SplitExpense is currently completely free to use for all
+                Yes! Splitify is currently completely free to use for all
                 personal groups.
               </AccordionContent>
             </AccordionItem>

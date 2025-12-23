@@ -62,7 +62,7 @@ export function Login() {
               $
             </span>
           </span>
-          <span className="text-xl font-bold">SplitExpense</span>
+          <span className="text-xl font-bold">Splitify</span>
         </div>
 
         <div className="relative z-10">
@@ -70,13 +70,13 @@ export function Login() {
             Managing shared expenses has never been easier.
           </h1>
           <p className="text-lg text-zinc-400">
-            Join thousands of users who trust SplitExpense to keep track of
-            bills, splits, and IOUs with friends and family.
+            Join thousands of users who trust Splitify to keep track of bills,
+            splits, and IOUs with friends and family.
           </p>
         </div>
 
         <div className="relative z-10 text-sm text-zinc-500">
-          &copy; 2025 SplitExpense. All rights reserved.
+          &copy; 2025 Splitify. All rights reserved.
         </div>
       </div>
 

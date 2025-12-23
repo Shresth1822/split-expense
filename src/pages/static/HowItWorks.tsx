@@ -10,7 +10,7 @@ export function HowItWorks() {
         <CardContent>
           <div className="prose dark:prose-invert">
             <p className="text-lg text-muted-foreground">
-              Getting started with SplitExpense is simple.
+              Getting started with Splitify is simple.
             </p>
             <ol className="list-decimal pl-6 space-y-4 mt-4">
               <li>

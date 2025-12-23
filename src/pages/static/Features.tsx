@@ -10,7 +10,7 @@ export function Features() {
         <CardContent>
           <div className="prose dark:prose-invert">
             <p className="text-lg text-muted-foreground">
-              Discover what makes SplitExpense the best way to manage shared
+              Discover what makes Splitify the best way to manage shared
               expenses.
             </p>
             <ul className="list-disc pl-6 space-y-2 mt-4">
