@@ -35,11 +35,11 @@ export function Header() {
         {/* Logo */}
         <div className="flex items-center gap-2">
           <Link to="/" className="flex items-center gap-2">
-            <span className="bg-primary text-primary-foreground p-1 rounded-md">
-              <span className="font-bold text-lg leading-none flex items-center justify-center w-5 h-5">
-                $
-              </span>
-            </span>
+            <img
+              src="/splitify-logo.png"
+              alt="Splitify Logo"
+              className="h-8 w-8 object-contain"
+            />
             <span className="text-xl font-bold hidden sm:inline-block">
               Splitify
             </span>

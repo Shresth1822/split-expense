@@ -124,11 +124,11 @@ export function Register() {
 
         {/* Content */}
         <div className="relative z-10 flex items-center gap-2">
-          <span className="bg-primary text-primary-foreground p-1 rounded-md">
-            <span className="font-bold text-lg leading-none flex items-center justify-center w-5 h-5">
-              $
-            </span>
-          </span>
+          <img
+            src="/splitify-logo.png"
+            alt="Splitify Logo"
+            className="h-10 w-10 object-contain"
+          />
           <span className="text-xl font-bold">Splitify</span>
         </div>
 

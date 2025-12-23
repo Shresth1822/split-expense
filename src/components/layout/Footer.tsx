@@ -8,9 +8,11 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <span className="bg-primary text-primary-foreground p-1 rounded-md">
-                <span className="font-bold text-lg">$</span>
-              </span>
+              <img
+                src="/splitify-logo.png"
+                alt="Splitify Logo"
+                className="h-8 w-8 object-contain"
+              />
               <span className="text-xl font-bold">Splitify</span>
             </div>
             <p className="text-sm text-muted-foreground">
