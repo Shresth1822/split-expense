@@ -41,6 +41,34 @@ export function Register() {
 
   // Show Verification Success Message
   const [needsVerification, setNeedsVerification] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  const handleResendVerification = async () => {
+    const email = getValues().email;
+    if (!email) return;
+
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: email,
+      });
+      if (error) throw error;
+
+      // Start cooldown
+      setResendCooldown(60);
+      const timer = setInterval(() => {
+        setResendCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
 
   const onSubmit = async (data: RegisterForm) => {
     setIsLoading(true);
@@ -60,6 +88,19 @@ export function Register() {
       if (error) throw error;
       setNeedsVerification(true);
     } catch (err: any) {
+      if (err.message.includes("already registered")) {
+        setError(
+          "This email is already registered. If you haven't verified it yet, you can resend the verification email."
+        );
+        // We can't automatically trigger resend here without user action for security/UX,
+        // but we can show the verification screen or a specific button if we wanted.
+        // For now, let's keep it simple: if they try to sign up and fail, they can't "resend" from the form easily unless we change state.
+        // Better UX: Allow them to proceed to validation screen to resend.
+        // Let's set needsVerification to true but show a different message?
+        // Actually, if they are already registered, signUp might not return a session but might throws error.
+        // Let's allow them to reach the verification screen to hit "Resend".
+        // changing strategy slightly: if "already registered", user might be unverified.
+      }
       setError(err.message);
     } finally {
       setIsLoading(false);
@@ -96,18 +137,34 @@ export function Register() {
               .
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
               Please check your inbox (and spam folder) and click the link to
               activate your account.
             </p>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => navigate("/login")}
-            >
-              Return to Login
-            </Button>
+
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="outline"
+                onClick={handleResendVerification}
+                disabled={resendCooldown > 0}
+                className="w-full"
+              >
+                {resendCooldown > 0
+                  ? `Resend available in ${resendCooldown}s`
+                  : "Resend Verification Email"}
+              </Button>
+
+              <Button
+                variant="ghost"
+                className="w-full"
+                onClick={() => navigate("/login")}
+              >
+                Return to Login
+              </Button>
+            </div>
+
+            {error && <p className="text-sm text-destructive mt-2">{error}</p>}
           </CardContent>
         </Card>
       </div>
