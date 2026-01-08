@@ -7,10 +7,18 @@ import { Button } from "@/components/ui/button";
 
 import { useRecentActivity } from "@/hooks/useRecentActivity";
 
+import { Separator } from "@/components/ui/separator";
+import { SettleUpModal } from "@/components/expenses/SettleUpModal";
+import { useState } from "react";
+
 export function Dashboard() {
   const { data: balances, isLoading: loadingBalances } = useBalances();
   const { data: debts, isLoading: loadingDebts } = useDebtBreakdown();
   const { data: activity, isLoading: loadingActivity } = useRecentActivity();
+
+  // State for Settle Up Modal
+  const [settleUpTarget, setSettleUpTarget] = useState<any>(null);
+  const isSettleModalOpen = !!settleUpTarget;
 
   const isLoading = loadingBalances || loadingDebts || loadingActivity;
 
