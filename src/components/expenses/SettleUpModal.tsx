@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-import { DebtItem } from "@/hooks/useDebtBreakdown";
+import { type DebtItem } from "@/hooks/useDebtBreakdown";
 import { useAuth } from "@/context/AuthContext";
 
 interface SettleUpModalProps {
