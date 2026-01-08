@@ -37,9 +37,15 @@ export function SettleUpModal({
     setAmount(debtItem.totalAmount.toFixed(2));
   }
 
+  /*
+   * Updated Logic:
+   * Settlements are now independent of groups. We don't send group_id.
+   * The text "Warning: Could not determine shared group" is no longer needed.
+   */
+
   const settleUpMutation = useMutation({
     mutationFn: async () => {
-      if (!user || !debtItem || !debtItem.commonGroupId) {
+      if (!user || !debtItem) {
         throw new Error("Missing information to settle up");
       }
 
@@ -48,11 +54,11 @@ export function SettleUpModal({
         throw new Error("Invalid amount");
       }
 
-      // 1. Create Expense ("Settlement")
+      // 1. Create Expense ("Settlement") - No Group ID
       const { data: expenseData, error: expenseError } = await supabase
         .from("expenses")
         .insert({
-          group_id: debtItem.commonGroupId,
+          // group_id is intentionally omitted (NULL) so it doesn't appear in group feeds
           paid_by: user.id,
           description: "Settlement",
           amount: settleAmount,
@@ -129,11 +135,7 @@ export function SettleUpModal({
               />
             </div>
           </div>
-          {!debtItem.commonGroupId && (
-            <p className="text-sm text-destructive">
-              Warning: Could not determine shared group. Settlement might fail.
-            </p>
-          )}
+          {/* Warning removed as group_id is no longer required */}
         </div>
 
         <DialogFooter>
