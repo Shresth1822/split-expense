@@ -245,14 +245,11 @@ export function Dashboard() {
           </Card>
         </div>
       </div>
+      <SettleUpModal
+        isOpen={isSettleModalOpen}
+        onClose={() => setSettleUpTarget(null)}
+        debtItem={settleUpTarget}
+      />
     </div>
-    
-    {/* Settle Up Modal */}
-    <SettleUpModal
-      isOpen={isSettleModalOpen}
-      onClose={() => setSettleUpTarget(null)}
-      debtItem={settleUpTarget}
-    />
-  </div>
-);
+  );
 }
