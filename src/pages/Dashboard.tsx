@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 
 import { useRecentActivity } from "@/hooks/useRecentActivity";
 
-import { Separator } from "@/components/ui/separator";
 import { SettleUpModal } from "@/components/expenses/SettleUpModal";
 import { useState } from "react";
 
@@ -213,15 +212,27 @@ export function Dashboard() {
                           </p>
                         </div>
                       </div>
-                      <span
-                        className={`font-bold text-sm ${
-                          debt.totalAmount > 0
-                            ? "text-red-500"
-                            : "text-green-500"
-                        }`}
-                      >
-                        ₹{Math.abs(debt.totalAmount).toFixed(2)}
-                      </span>
+                      <div className="flex flex-col items-end gap-1">
+                        <span
+                          className={`font-bold text-sm ${
+                            debt.totalAmount > 0
+                              ? "text-red-500"
+                              : "text-green-500"
+                          }`}
+                        >
+                          ₹{Math.abs(debt.totalAmount).toFixed(2)}
+                        </span>
+                        {debt.totalAmount > 0 && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-6 text-xs px-2"
+                            onClick={() => setSettleUpTarget(debt)}
+                          >
+                            Settle Up
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -235,5 +246,13 @@ export function Dashboard() {
         </div>
       </div>
     </div>
-  );
+    
+    {/* Settle Up Modal */}
+    <SettleUpModal
+      isOpen={isSettleModalOpen}
+      onClose={() => setSettleUpTarget(null)}
+      debtItem={settleUpTarget}
+    />
+  </div>
+);
 }
