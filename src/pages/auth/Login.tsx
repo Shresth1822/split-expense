@@ -19,14 +19,48 @@ export function Login() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  // Resend logic for Login page
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const {
     register,
     handleSubmit,
+    getValues, // Login form needs getValues for email
     formState: { errors },
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
   });
+
+  const handleResendVerification = async () => {
+    const email = getValues().email;
+    if (!email) return;
+
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: email,
+      });
+      if (error) throw error;
+
+      // Start cooldown
+      setResendCooldown(60);
+      const timer = setInterval(() => {
+        setResendCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      // Optional: Show success feedback?
+      // For now, if no error, we assume sent.
+      // Could clear error or show toast.
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
 
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
@@ -94,6 +128,20 @@ export function Login() {
             {error && (
               <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
                 {error}
+                {(error.includes("Email not confirmed") ||
+                  error.includes("Invalid login credentials")) && (
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="p-0 h-auto font-normal text-destructive underline ml-1 align-baseline"
+                    onClick={handleResendVerification}
+                    disabled={resendCooldown > 0}
+                  >
+                    {resendCooldown > 0
+                      ? `Wait ${resendCooldown}s`
+                      : "Unverified? Resend Email"}
+                  </Button>
+                )}
               </div>
             )}
             <div className="grid gap-2">
@@ -105,30 +153,31 @@ export function Login() {
                 {...register("email")}
               />
               {errors.email && (
-                <p className="text-xs text-destructive">
-                  {errors.email.message}
-                </p>
+                <p className="text-sm text-red-500">{errors.email.message}</p>
               )}
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
-                {/* <Link // Future: Forgot Password
+                <Link
                   to="/forgot-password"
                   className="ml-auto inline-block text-sm underline"
                 >
                   Forgot your password?
-                </Link> */}
+                </Link>
               </div>
               <Input id="password" type="password" {...register("password")} />
               {errors.password && (
-                <p className="text-xs text-destructive">
+                <p className="text-sm text-red-500">
                   {errors.password.message}
                 </p>
               )}
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Login"}
+              {isLoading ? "Logging in..." : "Login"}
+            </Button>
+            <Button variant="outline" className="w-full">
+              Login with Google
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
