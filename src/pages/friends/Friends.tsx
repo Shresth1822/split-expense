@@ -7,15 +7,18 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
   TrendingUp,
+  Clock,
 } from "lucide-react";
 import { useFriends } from "@/hooks/useFriends";
 import { useDebtBreakdown } from "@/hooks/useDebtBreakdown";
 import { AddFriend } from "@/components/friends/AddFriend";
+import { FriendRequests } from "@/components/friends/FriendRequests";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function Friends() {
-  const { data: friends, isLoading: friendsLoading } = useFriends();
+  const { data: allFriends, isLoading: friendsLoading } = useFriends();
   const { data: debts, isLoading: debtsLoading } = useDebtBreakdown();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -27,7 +30,21 @@ export function Friends() {
     );
   }
 
-  // Calculate Stats
+  // Filter Friends vs Requests
+  const acceptedFriends =
+    allFriends?.filter((f) => f.status === "accepted") || [];
+  const incomingRequests =
+    allFriends?.filter(
+      (f) => f.status === "pending" && f.request_direction === "received"
+    ) || [];
+
+  // Also track sent requests if needed, but for now just incoming + accepted
+  const sentRequests =
+    allFriends?.filter(
+      (f) => f.status === "pending" && f.request_direction === "sent"
+    ) || [];
+
+  // Calculate Stats (Only for accepted friends)
   let totalOwed = 0;
   let totalOwe = 0;
 
@@ -43,7 +60,7 @@ export function Friends() {
     }
   });
 
-  const filteredFriends = friends?.filter(
+  const filteredAcceptedFriends = acceptedFriends.filter(
     (f) =>
       f.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       f.email?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -62,137 +79,199 @@ export function Friends() {
         <AddFriend />
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-card/50 border-green-500/20 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total you're owed
-            </CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-              <ArrowUpRight className="h-4 w-4 text-green-500" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-500">
-              ₹{totalOwed.toFixed(2)}
-            </div>
-          </CardContent>
-        </Card>
+      <Tabs defaultValue="friends" className="w-full">
+        <TabsList className="grid w-full max-w-[400px] grid-cols-2 mb-6">
+          <TabsTrigger value="friends">
+            My Friends ({acceptedFriends.length})
+          </TabsTrigger>
+          <TabsTrigger value="requests">
+            Requests
+            {incomingRequests.length > 0 && (
+              <Badge
+                variant="secondary"
+                className="ml-2 h-5 px-1.5 rounded-full text-xs"
+              >
+                {incomingRequests.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
 
-        <Card className="bg-card/50 border-destructive/20 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total you owe
-            </CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-destructive/10 flex items-center justify-center">
-              <ArrowDownLeft className="h-4 w-4 text-destructive" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-destructive">
-              ₹{totalOwe.toFixed(2)}
-            </div>
-          </CardContent>
-        </Card>
+        <TabsContent value="friends" className="space-y-8">
+          {/* Stats Cards */}
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card className="bg-card/50 border-green-500/20 shadow-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Total you're owed
+                </CardTitle>
+                <div className="h-8 w-8 rounded-lg bg-green-500/10 flex items-center justify-center">
+                  <ArrowUpRight className="h-4 w-4 text-green-500" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-green-500">
+                  ₹{totalOwed.toFixed(2)}
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="bg-card/50 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total friends
-            </CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-secondary flex items-center justify-center">
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{friends?.length || 0}</div>
-          </CardContent>
-        </Card>
-      </div>
+            <Card className="bg-card/50 border-destructive/20 shadow-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Total you owe
+                </CardTitle>
+                <div className="h-8 w-8 rounded-lg bg-destructive/10 flex items-center justify-center">
+                  <ArrowDownLeft className="h-4 w-4 text-destructive" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-destructive">
+                  ₹{totalOwe.toFixed(2)}
+                </div>
+              </CardContent>
+            </Card>
 
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search friends..."
-          className="pl-10 h-12 bg-card/50"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+            <Card className="bg-card/50 shadow-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Total friends
+                </CardTitle>
+                <div className="h-8 w-8 rounded-lg bg-secondary flex items-center justify-center">
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">
+                  {acceptedFriends.length}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-      {/* Friends Grid */}
-      <Card className="bg-transparent border-0 shadow-none">
-        <CardContent className="p-0">
-          {filteredFriends && filteredFriends.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredFriends.map((friend) => {
-                const balance = balanceMap[friend.id] || 0;
-                return (
-                  <div
-                    key={friend.id}
-                    className="group flex items-center justify-between p-4 rounded-xl border bg-card/50 hover:bg-card hover:border-primary/50 transition-all duration-200 shadow-sm"
-                  >
-                    <div className="flex items-center gap-4">
-                      <Avatar className="h-12 w-12 border-2 border-transparent group-hover:border-primary/20 transition-colors">
-                        <AvatarImage src={friend.avatar_url || ""} />
-                        <AvatarFallback className="text-lg font-bold bg-primary/10 text-primary">
-                          {friend.full_name?.charAt(0) || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="space-y-1">
-                        <p className="font-semibold leading-none">
-                          {friend.full_name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {friend.email}
-                        </p>
-                        {/* Optional: Add 'x expenses' badge here if data available */}
-                      </div>
-                    </div>
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search friends..."
+              className="pl-10 h-12 bg-card/50"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
 
-                    <div className="text-right">
-                      {balance === 0 ? (
-                        <Badge
-                          variant="secondary"
-                          className="bg-secondary/50 text-muted-foreground font-normal"
-                        >
-                          Settled up
-                        </Badge>
-                      ) : (
-                        <>
-                          <div
-                            className={`text-lg font-bold ${
-                              balance > 0
-                                ? "text-destructive"
-                                : "text-green-500"
-                            }`}
-                          >
-                            {balance > 0 ? "-" : "+"}₹
-                            {Math.abs(balance).toFixed(2)}
+          {/* Friends Grid */}
+          <Card className="bg-transparent border-0 shadow-none">
+            <CardContent className="p-0">
+              {filteredAcceptedFriends.length > 0 ? (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredAcceptedFriends.map((friend) => {
+                    const balance = balanceMap[friend.id] || 0;
+                    return (
+                      <div
+                        key={friend.id}
+                        className="group flex items-center justify-between p-4 rounded-xl border bg-card/50 hover:bg-card hover:border-primary/50 transition-all duration-200 shadow-sm"
+                      >
+                        <div className="flex items-center gap-4">
+                          <Avatar className="h-12 w-12 border-2 border-transparent group-hover:border-primary/20 transition-colors">
+                            <AvatarImage src={friend.avatar_url || ""} />
+                            <AvatarFallback className="text-lg font-bold bg-primary/10 text-primary">
+                              {friend.full_name?.charAt(0) || "U"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="space-y-1">
+                            <p className="font-semibold leading-none">
+                              {friend.full_name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {friend.email}
+                            </p>
                           </div>
-                          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-                            {balance > 0 ? "you owe" : "owes you"}
-                          </p>
-                        </>
-                      )}
+                        </div>
+
+                        <div className="text-right">
+                          {balance === 0 ? (
+                            <Badge
+                              variant="secondary"
+                              className="bg-secondary/50 text-muted-foreground font-normal"
+                            >
+                              Settled up
+                            </Badge>
+                          ) : (
+                            <>
+                              <div
+                                className={`text-lg font-bold ${
+                                  balance > 0
+                                    ? "text-destructive"
+                                    : "text-green-500"
+                                }`}
+                              >
+                                {balance > 0 ? "-" : "+"}₹
+                                {Math.abs(balance).toFixed(2)}
+                              </div>
+                              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                                {balance > 0 ? "you owe" : "owes you"}
+                              </p>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-20 bg-card/30 rounded-xl border border-dashed">
+                  <Users className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                  <h3 className="text-lg font-medium">No friends found</h3>
+                  <p className="text-muted-foreground text-sm mt-1">
+                    Try a different search term or add a new friend.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Sent Requests List (Optional Section) */}
+          {sentRequests.length > 0 && (
+            <div className="mt-8">
+              <h3 className="text-sm font-medium text-muted-foreground mb-4 flex items-center gap-2">
+                <Clock className="h-4 w-4" /> Sent Requests
+              </h3>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 opacity-70">
+                {sentRequests.map((req) => (
+                  <div
+                    key={req.id}
+                    className="flex items-center gap-3 p-3 border rounded-lg bg-muted/20"
+                  >
+                    <Avatar className="h-8 w-8 opacity-70">
+                      <AvatarFallback>
+                        {req.full_name?.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="text-sm">
+                      <p className="font-medium">{req.full_name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Request Sent
+                      </p>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-20 bg-card/30 rounded-xl border border-dashed">
-              <Users className="h-12 w-12 mx-auto mb-4 opacity-20" />
-              <h3 className="text-lg font-medium">No friends found</h3>
-              <p className="text-muted-foreground text-sm mt-1">
-                Try a different search term or add a new friend.
-              </p>
+                ))}
+              </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </TabsContent>
+
+        <TabsContent value="requests">
+          <Card className="bg-transparent border-0 shadow-none">
+            <CardHeader className="px-0 pt-0">
+              <CardTitle className="text-lg">Incoming Requests</CardTitle>
+            </CardHeader>
+            <CardContent className="px-0">
+              <FriendRequests requests={incomingRequests} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

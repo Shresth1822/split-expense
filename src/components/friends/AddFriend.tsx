@@ -57,7 +57,7 @@ export function AddFriend() {
       }
     },
     onSuccess: () => {
-      toast.success("Friend added successfully!");
+      toast.success("Friend request sent!");
       setOpen(false);
       setEmail("");
       queryClient.invalidateQueries({ queryKey: ["friends"] });
@@ -113,7 +113,7 @@ export function AddFriend() {
               {addFriendMutation.isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Add Friend
+              Send Friend Request
             </Button>
           </DialogFooter>
         </form>
