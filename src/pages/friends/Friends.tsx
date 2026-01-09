@@ -16,11 +16,50 @@ import { FriendRequests } from "@/components/friends/FriendRequests";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
+import { UserMinus } from "lucide-react";
 
 export function Friends() {
   const { data: allFriends, isLoading: friendsLoading } = useFriends();
   const { data: debts, isLoading: debtsLoading } = useDebtBreakdown();
   const [searchTerm, setSearchTerm] = useState("");
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  const deleteFriendMutation = useMutation({
+    mutationFn: async (friendId: string) => {
+      // Delete records where I am user_Id OR friend_id
+      const { error } = await supabase
+        .from("friendships")
+        .delete()
+        .or(
+          `and(user_id.eq.${user?.id},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${user?.id})`
+        );
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Friend removed");
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
+    },
+    onError: (error) => {
+      toast.error("Failed to remove friend: " + error.message);
+    },
+  });
 
   if (friendsLoading || debtsLoading) {
     return (
@@ -189,30 +228,76 @@ export function Friends() {
                           </div>
                         </div>
 
-                        <div className="text-right">
-                          {balance === 0 ? (
-                            <Badge
-                              variant="secondary"
-                              className="bg-secondary/50 text-muted-foreground font-normal"
-                            >
-                              Settled up
-                            </Badge>
-                          ) : (
-                            <>
-                              <div
-                                className={`text-lg font-bold ${
-                                  balance > 0
-                                    ? "text-destructive"
-                                    : "text-green-500"
-                                }`}
+                        <div className="text-right flex items-center gap-4">
+                          {/* Balance Display */}
+                          <div className="text-right">
+                            {balance === 0 ? (
+                              <Badge
+                                variant="secondary"
+                                className="bg-secondary/50 text-muted-foreground font-normal"
                               >
-                                {balance > 0 ? "-" : "+"}₹
-                                {Math.abs(balance).toFixed(2)}
-                              </div>
-                              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-                                {balance > 0 ? "you owe" : "owes you"}
-                              </p>
-                            </>
+                                Settled up
+                              </Badge>
+                            ) : (
+                              <>
+                                <div
+                                  className={`text-lg font-bold ${
+                                    balance > 0
+                                      ? "text-destructive"
+                                      : "text-green-500"
+                                  }`}
+                                >
+                                  {balance > 0 ? "-" : "+"}₹
+                                  {Math.abs(balance).toFixed(2)}
+                                </div>
+                                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                                  {balance > 0 ? "you owe" : "owes you"}
+                                </p>
+                              </>
+                            )}
+                          </div>
+
+                          {/* Remove Friend Action (Only for explicit friends) */}
+                          {friend.is_explicit && (
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                  >
+                                    <UserMinus className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Remove Friend?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to remove{" "}
+                                      <strong>{friend.full_name}</strong> from
+                                      your friends list? This will not delete
+                                      their expense history.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                      Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      onClick={() =>
+                                        deleteFriendMutation.mutate(friend.id)
+                                      }
+                                    >
+                                      Remove
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
                           )}
                         </div>
                       </div>

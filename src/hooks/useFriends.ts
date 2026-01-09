@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 
@@ -9,10 +9,12 @@ export interface Friend {
   avatar_url?: string | null;
   status: "accepted" | "pending"; // Added status
   request_direction?: "sent" | "received"; // Added to know filter logic
+  is_explicit: boolean; // Added to distinguish explicit friends from group contacts
 }
 
 export function useFriends() {
   const { user } = useAuth();
+  const queryClient = useQueryClient(); // Add queryClient mainly for consistency if needed, but not used here directly
 
   return useQuery({
     queryKey: ["friends", user?.id],
@@ -68,6 +70,7 @@ export function useFriends() {
           uniqueFriendsMap.set(member.profiles.id, {
             ...member.profiles,
             status: "accepted", // Implicitly accepted if in same group
+            is_explicit: false,
           });
         }
       });
@@ -83,6 +86,7 @@ export function useFriends() {
             ...otherProfile,
             status: rel.status,
             request_direction: direction,
+            is_explicit: true,
           });
         }
       });
