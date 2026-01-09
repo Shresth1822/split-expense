@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 
@@ -14,7 +14,7 @@ export interface Friend {
 
 export function useFriends() {
   const { user } = useAuth();
-  const queryClient = useQueryClient(); // Add queryClient mainly for consistency if needed, but not used here directly
+  // const queryClient = useQueryClient(); // Unused
 
   return useQuery({
     queryKey: ["friends", user?.id],
