@@ -15,6 +15,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { Groups } from "./pages/groups/Groups";
 import { GroupDetails } from "./pages/groups/GroupDetails";
 import { Friends } from "./pages/friends/Friends";
+import { Activity } from "./pages/Activity";
 import { Profile } from "./pages/settings/Profile";
 
 import { Features } from "./pages/static/Features";
@@ -40,6 +41,7 @@ function App() {
                   <Route path="/groups" element={<Groups />} />
                   <Route path="/groups/:id" element={<GroupDetails />} />
                   <Route path="/friends" element={<Friends />} />
+                  <Route path="/activity" element={<Activity />} />
                   <Route path="/profile" element={<Profile />} />
 
                   {/* Static Pages */}

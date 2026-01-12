@@ -9,8 +9,11 @@ import { useRecentActivity } from "@/hooks/useRecentActivity";
 
 import { SettleUpModal } from "@/components/expenses/SettleUpModal";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ActivityItem } from "@/components/activity/ActivityItem";
 
 export function Dashboard() {
+  const navigate = useNavigate();
   const { data: balances, isLoading: loadingBalances } = useBalances();
   const { data: debts, isLoading: loadingDebts } = useDebtBreakdown();
   const { data: activity, isLoading: loadingActivity } = useRecentActivity();
@@ -109,7 +112,11 @@ export function Dashboard() {
         <div className="md:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-bold">Recent Activity</h3>
-            <Button variant="link" className="text-primary p-0 h-auto">
+            <Button
+              variant="link"
+              className="text-primary p-0 h-auto"
+              onClick={() => navigate("/activity")}
+            >
               View all
             </Button>
           </div>
@@ -117,55 +124,7 @@ export function Dashboard() {
           <div className="rounded-xl border bg-card/50 shadow-sm divide-y">
             {activity && activity.length > 0 ? (
               activity.map((item: any) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between p-4 hover:bg-accent/50 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold ${
-                        item.type === "expense"
-                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                          : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                      }`}
-                    >
-                      {item.profiles?.full_name
-                        ?.substring(0, 2)
-                        .toUpperCase() || "US"}
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">
-                        <span className="font-bold">
-                          {item.profiles?.full_name?.split(" ")[0]}
-                        </span>{" "}
-                        {item.type === "settlement" ? "settled up" : "added"}{" "}
-                        <span className="text-foreground/90">
-                          {item.description}
-                        </span>
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(item.date).toLocaleDateString()}
-                        </span>
-                        {item.groups?.name && (
-                          <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold text-foreground/70">
-                            {item.groups.name}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    className={`text-right font-bold ${
-                      item.type === "settlement"
-                        ? "text-green-500"
-                        : "text-foreground"
-                    }`}
-                  >
-                    {item.type === "settlement" ? "+" : ""}₹
-                    {item.amount.toFixed(2)}
-                  </div>
-                </div>
+                <ActivityItem key={item.id} item={item} />
               ))
             ) : (
               <div className="p-8 text-center text-muted-foreground">
@@ -179,7 +138,11 @@ export function Dashboard() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-bold">Friends</h3>
-            <Button variant="link" className="text-primary p-0 h-auto">
+            <Button
+              variant="link"
+              className="text-primary p-0 h-auto"
+              onClick={() => navigate("/friends")}
+            >
               View all
             </Button>
           </div>

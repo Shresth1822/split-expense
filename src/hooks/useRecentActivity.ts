@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 
-export function useRecentActivity() {
+export function useRecentActivity(limit = 10) {
   return useQuery({
-    queryKey: ["recent-activity"],
+    queryKey: ["recent-activity", limit],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("expenses")
@@ -19,7 +19,7 @@ export function useRecentActivity() {
         `
         )
         .order("created_at", { ascending: false })
-        .limit(10);
+        .limit(limit);
 
       if (error) throw error;
       return data;
