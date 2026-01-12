@@ -47,11 +47,16 @@ type GroupDetails = Group & {
   })[];
 };
 
+import { EditExpense } from "@/components/expenses/EditExpense";
+
+// ... previous imports
+
 export function GroupDetails() {
   const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteError, setInviteError] = useState("");
+  const [editingExpense, setEditingExpense] = useState<string | null>(null);
 
   const { data: friends } = useFriends();
 
@@ -300,7 +305,10 @@ export function GroupDetails() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem disabled>
+                              <DropdownMenuItem
+                                onClick={() => setEditingExpense(expense.id)}
+                                className="cursor-pointer"
+                              >
                                 Edit Expense
                               </DropdownMenuItem>
                               <DropdownMenuItem
@@ -436,6 +444,17 @@ export function GroupDetails() {
           </Card>
         </div>
       </div>
+
+      {/* Edit Expense Modal */}
+      {editingExpense && (
+        <EditExpense
+          expenseId={editingExpense}
+          groupId={id!}
+          members={group.group_members}
+          isOpen={!!editingExpense}
+          onClose={() => setEditingExpense(null)}
+        />
+      )}
     </div>
   );
 }
