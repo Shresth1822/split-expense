@@ -36,6 +36,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { EditExpense } from "@/components/expenses/EditExpense";
+import { useAuth } from "@/context/AuthContext";
+import { GroupSettingsDialog } from "@/components/groups/GroupSettingsDialog";
+
 type GroupDetails = Group & {
   group_members: (GroupMember & {
     profiles: Profile;
@@ -44,12 +48,6 @@ type GroupDetails = Group & {
     profiles: Profile;
   })[];
 };
-
-import { EditExpense } from "@/components/expenses/EditExpense";
-import { useAuth } from "@/context/AuthContext";
-import { GroupSettingsDialog } from "@/components/groups/GroupSettingsDialog";
-
-// ... previous imports
 
 export function GroupDetails() {
   const { id } = useParams<{ id: string }>();
@@ -131,10 +129,11 @@ export function GroupDetails() {
       queryClient.invalidateQueries({ queryKey: ["balances"] });
       queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
       queryClient.invalidateQueries({ queryKey: ["debts"] });
+      toast.success("Expense deleted successfully");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Failed to delete expense:", error);
-      alert("Failed to delete expense. You might not have permission.");
+      toast.error(error.message || "Failed to delete expense");
     },
   });
 
@@ -156,7 +155,8 @@ export function GroupDetails() {
 
   const availableFriends = friends?.filter(
     (friend) =>
-      !group.group_members.some((member) => member.user_id === friend.id)
+      !group.group_members.some((member) => member.user_id === friend.id) &&
+      friend.status === "accepted"
   );
 
   return (
@@ -369,7 +369,7 @@ export function GroupDetails() {
               {availableFriends && availableFriends.length > 0 && (
                 <div className="pt-4 border-t">
                   <h4 className="text-sm font-medium mb-3">Add Member</h4>
-                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
                     {availableFriends.map((friend) => (
                       <div
                         key={friend.id}
