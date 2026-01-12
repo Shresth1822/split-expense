@@ -3,20 +3,18 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import {
   ArrowLeft,
-  UserPlus,
   MessageSquare,
   Receipt,
   Calendar,
   Users,
   MoreHorizontal,
-  Settings,
   Plus,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Group, GroupMember, Profile } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 import { useFriends } from "@/hooks/useFriends";
 import { AddExpense } from "@/components/expenses/AddExpense";
@@ -48,14 +46,15 @@ type GroupDetails = Group & {
 };
 
 import { EditExpense } from "@/components/expenses/EditExpense";
+import { useAuth } from "@/context/AuthContext";
+import { GroupSettingsDialog } from "@/components/groups/GroupSettingsDialog";
 
 // ... previous imports
 
 export function GroupDetails() {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteError, setInviteError] = useState("");
   const [editingExpense, setEditingExpense] = useState<string | null>(null);
 
   const { data: friends } = useFriends();
@@ -112,19 +111,12 @@ export function GroupDetails() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["group", id] });
-      setInviteEmail("");
-      setInviteError("");
+      toast.success("Member added successfully!");
     },
     onError: (err: any) => {
-      setInviteError(err.message);
+      toast.error(err.message || "Failed to add member");
     },
   });
-
-  const handleInvite = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inviteEmail) return;
-    addMember.mutate(inviteEmail);
-  };
 
   const deleteExpense = useMutation({
     mutationFn: async (expenseId: string) => {
@@ -343,9 +335,9 @@ export function GroupDetails() {
             <h3 className="text-xl font-bold flex items-center gap-2">
               <Users className="h-5 w-5" /> Members
             </h3>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Settings className="h-4 w-4" />
-            </Button>
+            {user && (
+              <GroupSettingsDialog group={group} currentUserId={user.id} />
+            )}
           </div>
 
           <Card className="bg-card/50 shadow-sm border-0">
@@ -374,72 +366,44 @@ export function GroupDetails() {
                 ))}
               </div>
 
-              <div className="pt-4 border-t">
-                <h4 className="text-sm font-medium mb-3">Add Member</h4>
-                <form onSubmit={handleInvite} className="space-y-2">
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Email address"
-                      value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
-                      className="bg-background"
-                    />
-                    <Button
-                      type="submit"
-                      size="icon"
-                      disabled={addMember.isPending}
-                    >
-                      <UserPlus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  {inviteError && (
-                    <p className="text-xs text-destructive mt-1">
-                      {inviteError}
-                    </p>
-                  )}
-                </form>
-
-                {availableFriends && availableFriends.length > 0 && (
-                  <div className="mt-6 pt-4 border-t">
-                    <h4 className="text-sm font-medium mb-3 text-muted-foreground">
-                      Add from Friends
-                    </h4>
-                    <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                      {availableFriends.map((friend) => (
-                        <div
-                          key={friend.id}
-                          className="flex items-center justify-between p-2 rounded-lg bg-card/50 border hover:bg-card transition-colors"
-                        >
-                          <div className="flex items-center gap-2 overflow-hidden">
-                            <Avatar className="h-6 w-6">
-                              <AvatarImage src={friend.avatar_url || ""} />
-                              <AvatarFallback className="text-[10px]">
-                                {friend.full_name?.[0] || "F"}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span className="text-sm truncate">
-                              {friend.full_name || friend.email}
-                            </span>
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-7 w-7 p-0"
-                            onClick={() => {
-                              if (friend.email) {
-                                addMember.mutate(friend.email);
-                              }
-                            }}
-                            disabled={addMember.isPending}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
+              {availableFriends && availableFriends.length > 0 && (
+                <div className="pt-4 border-t">
+                  <h4 className="text-sm font-medium mb-3">Add Member</h4>
+                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    {availableFriends.map((friend) => (
+                      <div
+                        key={friend.id}
+                        className="flex items-center justify-between p-2 rounded-lg bg-card/50 border hover:bg-card transition-colors"
+                      >
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          <Avatar className="h-6 w-6">
+                            <AvatarImage src={friend.avatar_url || ""} />
+                            <AvatarFallback className="text-[10px]">
+                              {friend.full_name?.[0] || "F"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm truncate">
+                            {friend.full_name || friend.email}
+                          </span>
                         </div>
-                      ))}
-                    </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 w-7 p-0"
+                          onClick={() => {
+                            if (friend.email) {
+                              addMember.mutate(friend.email);
+                            }
+                          }}
+                          disabled={addMember.isPending}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
