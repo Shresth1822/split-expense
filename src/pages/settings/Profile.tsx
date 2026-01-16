@@ -15,7 +15,7 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { ModeToggle } from "@/components/ui/mode-toggle";
-import { Copy, Download, Trash2, Key, User, Share2 } from "lucide-react";
+import { Copy, Download, Trash2, Share2 } from "lucide-react";
 
 export function Profile() {
   const { user } = useAuth();
