@@ -5,6 +5,8 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AppLayout } from "./components/layout/AppLayout";
 import { Login } from "./pages/auth/Login";
 import { Register } from "./pages/auth/Register";
+import { ForgotPassword } from "./pages/auth/ForgotPassword";
+import { UpdatePassword } from "./pages/auth/UpdatePassword";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 
 const queryClient = new QueryClient();
@@ -34,6 +36,8 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/update-password" element={<UpdatePassword />} />
 
               <Route element={<ProtectedRoute />}>
                 <Route element={<AppLayout />}>
