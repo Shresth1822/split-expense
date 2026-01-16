@@ -31,8 +31,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <AuthProvider>
-          <BrowserRouter>
+        <BrowserRouter>
+          <AuthProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
@@ -41,6 +41,7 @@ function App() {
 
               <Route element={<ProtectedRoute />}>
                 <Route element={<AppLayout />}>
+                  {/* ... protected routes ... */}
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/groups" element={<Groups />} />
                   <Route path="/groups/:id" element={<GroupDetails />} />
@@ -58,9 +59,9 @@ function App() {
                 </Route>
               </Route>
             </Routes>
-          </BrowserRouter>
-          <Toaster />
-        </AuthProvider>
+            <Toaster />
+          </AuthProvider>
+        </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>
   );
