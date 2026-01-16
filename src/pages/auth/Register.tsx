@@ -81,6 +81,7 @@ export function Register() {
         options: {
           data: {
             full_name: data.fullName,
+            currency: "INR",
           },
         },
       });

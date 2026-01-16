@@ -26,7 +26,7 @@ export function Profile() {
     user?.user_metadata?.full_name || ""
   );
   const [preferredCurrency, setPreferredCurrency] = useState(
-    user?.user_metadata?.currency || "USD"
+    user?.user_metadata?.currency || "INR"
   );
 
   // Security Tab State
@@ -37,10 +37,20 @@ export function Profile() {
   const handleUpdateProfile = async () => {
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({
+      // 1. Update Auth Metadata (for session/future logins)
+      const { error: authError } = await supabase.auth.updateUser({
         data: { full_name: fullName, currency: preferredCurrency },
       });
-      if (error) throw error;
+      if (authError) throw authError;
+
+      // 2. Update Public Profile (for app display)
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ full_name: fullName }) // Only updating name as currency is likely just metadata for now
+        .eq("id", user?.id);
+
+      if (profileError) throw profileError;
+
       toast.success("Profile updated successfully!");
     } catch (error: any) {
       toast.error(error.message || "Failed to update profile");
