@@ -19,14 +19,17 @@ export function JoinGroup() {
       if (!user || !groupId) return;
 
       try {
-        // 1. Verify Group Exists
+        // 1. Verify Group Exists (using Security Definer RPC)
         const { data: group, error: groupError } = await supabase
-          .from("groups")
-          .select("name")
-          .eq("id", groupId)
+          .rpc("get_group_details_for_invite", {
+            target_group_id: groupId,
+          })
           .single();
 
-        if (groupError || !group) {
+        const groupData = group as { name: string } | null;
+
+        if (groupError || !groupData) {
+          console.error("Group fetch error:", groupError);
           setStatus("error");
           setErrorMsg("Group not found or link is invalid.");
           return;
@@ -42,7 +45,7 @@ export function JoinGroup() {
 
         if (membership) {
           // Already a member
-          toast.info(`You are already a member of "${group.name}"`);
+          toast.info(`You are already a member of "${groupData.name}"`);
           navigate(`/groups/${groupId}`);
           return;
         }
@@ -58,7 +61,7 @@ export function JoinGroup() {
 
         if (joinError) throw joinError;
 
-        toast.success(`Successfully joined "${group.name}"!`);
+        toast.success(`Successfully joined "${groupData.name}"!`);
         navigate(`/groups/${groupId}`);
       } catch (err: any) {
         console.error("Join Group Error:", err);
