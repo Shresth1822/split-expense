@@ -235,7 +235,7 @@ export function Friends() {
                             {balance === 0 ? (
                               <Badge
                                 variant="secondary"
-                                className="bg-secondary/50 text-muted-foreground font-normal"
+                                className="bg-secondary/50 text-muted-foreground font-normal whitespace-nowrap shrink-0"
                               >
                                 Settled up
                               </Badge>
