@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -17,6 +17,8 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   // Resend logic for Login page
@@ -73,7 +75,7 @@ export function Login() {
       });
 
       if (error) throw error;
-      navigate("/");
+      navigate(from, { replace: true });
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -182,7 +184,11 @@ export function Login() {
           </form>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
-            <Link to="/register" className="underline">
+            <Link
+              to="/register"
+              state={{ from: location.state?.from }}
+              className="underline"
+            >
               Sign up
             </Link>
           </div>

@@ -16,6 +16,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Dashboard } from "./pages/Dashboard";
 import { Groups } from "./pages/groups/Groups";
 import { GroupDetails } from "./pages/groups/GroupDetails";
+import { JoinGroup } from "./pages/groups/JoinGroup";
 import { Friends } from "./pages/friends/Friends";
 import { Activity } from "./pages/Activity";
 import { Profile } from "./pages/settings/Profile";
@@ -57,6 +58,7 @@ function App() {
                   <Route path="/terms" element={<TermsOfService />} />
                   <Route path="/cookie-policy" element={<CookiePolicy />} />
                 </Route>
+                <Route path="/join/:groupId" element={<JoinGroup />} />
               </Route>
             </Routes>
             <Toaster />

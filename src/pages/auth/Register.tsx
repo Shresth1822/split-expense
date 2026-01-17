@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -25,6 +25,13 @@ type RegisterForm = z.infer<typeof registerSchema>;
 
 export function Register() {
   const navigate = useNavigate();
+  const location = useLocation();
+  // If verifying email, user might be redirected here from email link,
+  // but standard signup flow -> user is created -> maybe auto signed in?
+  // Supabase default is auto sign in if email confirm is disabled.
+  // If enabled, they can't sign in yet.
+  // Assuming they can sign in or are signed in:
+  const from = location.state?.from?.pathname || "/";
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -75,7 +82,7 @@ export function Register() {
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -87,7 +94,14 @@ export function Register() {
       });
 
       if (error) throw error;
-      setNeedsVerification(true);
+
+      if (authData.session) {
+        // Auto-confirmed (e.g. dev mode or specific settings)
+        navigate(from, { replace: true });
+      } else {
+        // Email verification required
+        setNeedsVerification(true);
+      }
     } catch (err: any) {
       if (err.message.includes("already registered")) {
         setError(
@@ -159,7 +173,9 @@ export function Register() {
               <Button
                 variant="ghost"
                 className="w-full"
-                onClick={() => navigate("/login")}
+                onClick={() =>
+                  navigate("/login", { state: { from: location.state?.from } })
+                }
               >
                 Return to Login
               </Button>
@@ -263,7 +279,11 @@ export function Register() {
           </form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
-            <Link to="/login" className="underline">
+            <Link
+              to="/login"
+              state={{ from: location.state?.from }}
+              className="underline"
+            >
               Sign in
             </Link>
           </div>

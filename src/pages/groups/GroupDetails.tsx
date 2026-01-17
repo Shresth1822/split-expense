@@ -9,6 +9,7 @@ import {
   Users,
   MoreHorizontal,
   Plus,
+  Link as LinkIcon,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Group, GroupMember, Profile } from "@/types";
@@ -335,9 +336,23 @@ export function GroupDetails() {
             <h3 className="text-xl font-bold flex items-center gap-2">
               <Users className="h-5 w-5" /> Members
             </h3>
-            {user && (
-              <GroupSettingsDialog group={group} currentUserId={user.id} />
-            )}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const link = `${window.location.origin}/join/${id}`;
+                  navigator.clipboard.writeText(link);
+                  toast.success("Invite link copied to clipboard!");
+                }}
+              >
+                <LinkIcon className="h-4 w-4 mr-2" />
+                Invite Link
+              </Button>
+              {user && (
+                <GroupSettingsDialog group={group} currentUserId={user.id} />
+              )}
+            </div>
           </div>
 
           <Card className="bg-card/50 shadow-sm border-0">
