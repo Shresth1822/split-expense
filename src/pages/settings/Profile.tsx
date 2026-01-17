@@ -99,6 +99,22 @@ export function Profile() {
     toast.success("Invite link copied to clipboard!");
   };
 
+  const [inviteEmail, setInviteEmail] = useState("");
+
+  const handleInviteByEmail = () => {
+    if (!inviteEmail) {
+      toast.error("Please enter an email address");
+      return;
+    }
+    const subject = "Join me on Splitify";
+    const body = `Hey! I use Splitify to track expenses and settle debts. Join me here: ${window.location.origin}/register`;
+    window.location.href = `mailto:${inviteEmail}?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+    toast.success("Opening email client...");
+    setInviteEmail("");
+  };
+
   const handleExportData = () => {
     toast.info("Exporting data feature coming soon!");
     // Logic to generate CSV would go here
@@ -302,6 +318,21 @@ export function Profile() {
               >
                 <Share2 className="mr-2 h-4 w-4" /> Copy Invite Link
               </Button>
+
+              <div className="border-t pt-4 mt-4">
+                <Label className="mb-2 block">Invite via Email</Label>
+                <div className="flex items-center space-x-2">
+                  <Input
+                    placeholder="friend@example.com"
+                    type="email"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                  />
+                  <Button variant="outline" onClick={handleInviteByEmail}>
+                    Send
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
