@@ -22,31 +22,7 @@ export function useFriends() {
     queryFn: async () => {
       if (!user) return [];
 
-      // 1. Get all groups I am a member of (To find "Group Friends")
-      const { data: myGroups } = await supabase
-        .from("group_members")
-        .select("group_id")
-        .eq("user_id", user.id);
-
-      const groupIds = myGroups?.map((g) => g.group_id) || [];
-
-      // 2. Get all members of those groups (excluding me) - These are implicitly "accepted" friends or contacts
-      let groupMembers: any[] = [];
-      if (groupIds.length > 0) {
-        const { data: members } = await supabase
-          .from("group_members")
-          .select(
-            `
-            user_id,
-            profiles:user_id (id, full_name, email, avatar_url)
-          `
-          )
-          .in("group_id", groupIds)
-          .neq("user_id", user.id);
-        groupMembers = members || [];
-      }
-
-      // 3. Get explicit friends (BOTH accepted AND pending)
+      // 1. Get explicit friends (BOTH accepted AND pending)
       // We need to check both directions: where I am user_id OR friend_id
       const { data: explicitFriends } = await supabase
         .from("friendships")
@@ -61,21 +37,10 @@ export function useFriends() {
         )
         .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`); // Get all relationships involving me
 
-      // 4. Mappify users
+      // 2. Mappify users
       const uniqueFriendsMap = new Map<string, Friend>();
 
-      // A. Process Group Members (Implicit Friends - treated as accepted for now, or just contacts)
-      groupMembers.forEach((member: any) => {
-        if (member.profiles) {
-          uniqueFriendsMap.set(member.profiles.id, {
-            ...member.profiles,
-            status: "accepted", // Implicitly accepted if in same group
-            is_explicit: false,
-          });
-        }
-      });
-
-      // B. Process Explicit Friendships (Overwrites implicit if exists, providing more accurate status)
+      // Process Explicit Friendships
       explicitFriends?.forEach((rel: any) => {
         const isMeSender = rel.user_id === user.id;
         const otherProfile = isMeSender ? rel.friend : rel.user;

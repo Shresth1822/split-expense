@@ -138,6 +138,31 @@ export function GroupDetails() {
     },
   });
 
+  const addFriend = useMutation({
+    mutationFn: async (friendId: string) => {
+      // Check if already friends via RLS or duplicate logic, but simple insert works often
+      const { error } = await supabase.from("friendships").insert({
+        user_id: user?.id,
+        friend_id: friendId,
+        status: "pending", // Explicitly pending
+      });
+
+      if (error) {
+        if (error.code === "23505") {
+          throw new Error("Friend request already sent.");
+        }
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success("Friend request sent!");
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
+    },
+    onError: (err: any) => {
+      toast.error("Failed to send request: " + err.message);
+    },
+  });
+
   if (isLoading)
     return (
       <div className="p-8 text-center text-muted-foreground">
@@ -358,27 +383,67 @@ export function GroupDetails() {
           <Card className="bg-card/50 shadow-sm border-0">
             <CardContent className="p-4 space-y-6">
               <div className="space-y-3">
-                {group.group_members.map((member) => (
-                  <div
-                    key={member.user_id}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-card transition-colors"
-                  >
-                    <Avatar className="h-10 w-10 border-2 border-background">
-                      <AvatarImage src={member.profiles.avatar_url || ""} />
-                      <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                        {member.profiles.full_name?.[0] || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 overflow-hidden">
-                      <p className="text-sm font-medium truncate">
-                        {member.profiles.full_name || "User"}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {member.profiles.email}
-                      </p>
+                {group.group_members.map((member) => {
+                  const friendStatus = friends?.find(
+                    (f) => f.id === member.user_id
+                  )?.status;
+
+                  const isMe = member.user_id === user?.id;
+
+                  return (
+                    <div
+                      key={member.user_id}
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-card transition-colors group"
+                    >
+                      <Avatar className="h-10 w-10 border-2 border-background">
+                        <AvatarImage src={member.profiles.avatar_url || ""} />
+                        <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                          {member.profiles.full_name?.[0] || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 overflow-hidden">
+                        <p className="text-sm font-medium truncate">
+                          {member.profiles.full_name || "User"}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {member.profiles.email}
+                        </p>
+                      </div>
+
+                      {/* Friend Action Buttons */}
+                      {!isMe && (
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          {friendStatus === "accepted" ? (
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] text-green-600 border-green-200 bg-green-50"
+                            >
+                              Friend
+                            </Badge>
+                          ) : friendStatus === "pending" ? (
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] text-yellow-600 border-yellow-200 bg-yellow-50"
+                            >
+                              Sent
+                            </Badge>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary"
+                              title="Add Friend"
+                              disabled={addFriend.isPending}
+                              onClick={() => addFriend.mutate(member.user_id)}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {availableFriends && availableFriends.length > 0 && (
