@@ -238,7 +238,7 @@ export function Register() {
               />
             </div>
             <span className="text-xl font-bold tracking-tight">Splitify</span>
-            <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
+            <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto text-center">
               Start splitting bills the smart way. Track expenses and settle
               debts from the palm of your hand.
             </p>
