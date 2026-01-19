@@ -133,6 +133,10 @@ export function Login() {
               />
             </div>
             <span className="text-xl font-bold tracking-tight">Splitify</span>
+            <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
+              Managing shared expenses has never been easier. Keep track of
+              bills and debts with friends.
+            </p>
           </div>
 
           <div className="grid gap-2 text-center">
