@@ -154,9 +154,19 @@ export function Register() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Please check your inbox (and spam folder) and click the link to
-              activate your account.
+              Please check your inbox and click the link to activate your
+              account.
             </p>
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 text-sm text-amber-600 dark:text-amber-400">
+              <p className="font-medium flex items-center gap-2">
+                <span className="text-lg">⚠️</span> Can't find the email?
+              </p>
+              <p className="mt-1">
+                It might be in your <strong>Spam</strong> or{" "}
+                <strong>Junk</strong> folder. Please check there if it's not in
+                your primary inbox.
+              </p>
+            </div>
 
             <div className="flex flex-col gap-2">
               <Button
