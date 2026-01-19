@@ -129,7 +129,7 @@ export function Login() {
               <img
                 src="/splitify-logo.png"
                 alt="Logo"
-                className="h-8 w-8 object-contain invert brightness-0"
+                className="h-8 w-8 object-contain"
               />
             </div>
             <span className="text-xl font-bold tracking-tight">Splitify</span>
