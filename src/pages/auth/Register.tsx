@@ -105,7 +105,7 @@ export function Register() {
     } catch (err: any) {
       if (err.message.includes("already registered")) {
         setError(
-          "This email is already registered. If you haven't verified it yet, you can resend the verification email."
+          "This email is already registered. If you haven't verified it yet, you can resend the verification email.",
         );
         // We can't automatically trigger resend here without user action for security/UX,
         // but we can show the verification screen or a specific button if we wanted.
@@ -222,18 +222,36 @@ export function Register() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background">
-        <div className="mx-auto grid w-[350px] gap-6">
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background relative overflow-hidden">
+        {/* Mobile Background Elements */}
+        <div className="absolute top-0 right-0 -mr-24 -mt-24 h-64 w-64 rounded-full bg-primary/5 blur-3xl lg:hidden"></div>
+        <div className="absolute bottom-0 left-0 -ml-24 -mb-24 h-64 w-64 rounded-full bg-indigo-500/5 blur-3xl lg:hidden"></div>
+
+        <div className="mx-auto grid w-[350px] gap-6 relative z-10">
+          {/* Mobile Branding */}
+          <div className="flex flex-col items-center gap-2 mb-2 lg:hidden">
+            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center shadow-lg shadow-primary/20">
+              <img
+                src="/splitify-logo.png"
+                alt="Logo"
+                className="h-8 w-8 object-contain invert brightness-0"
+              />
+            </div>
+            <span className="text-xl font-bold tracking-tight">Splitify</span>
+          </div>
+
           <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold">Create an account</h1>
-            <p className="text-balance text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              Create an account
+            </h1>
+            <p className="text-balance text-muted-foreground text-sm sm:text-base">
               Enter your information to get started
             </p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             {error && (
-              <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive font-medium border border-destructive/20">
                 {error}
               </div>
             )}
@@ -243,9 +261,10 @@ export function Register() {
                 id="fullName"
                 placeholder="John Doe"
                 {...register("fullName")}
+                className="bg-card w-full"
               />
               {errors.fullName && (
-                <p className="text-xs text-destructive">
+                <p className="text-xs text-destructive font-medium">
                   {errors.fullName.message}
                 </p>
               )}
@@ -257,32 +276,42 @@ export function Register() {
                 type="email"
                 placeholder="m@example.com"
                 {...register("email")}
+                className="bg-card w-full"
               />
               {errors.email && (
-                <p className="text-xs text-destructive">
+                <p className="text-xs text-destructive font-medium">
                   {errors.email.message}
                 </p>
               )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" {...register("password")} />
+              <Input
+                id="password"
+                type="password"
+                {...register("password")}
+                className="bg-card w-full"
+              />
               {errors.password && (
-                <p className="text-xs text-destructive">
+                <p className="text-xs text-destructive font-medium">
                   {errors.password.message}
                 </p>
               )}
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-600/90 transition-all duration-300 shadow-md shadow-primary/20"
+              disabled={isLoading}
+            >
               {isLoading ? "Creating account..." : "Create account"}
             </Button>
           </form>
-          <div className="mt-4 text-center text-sm">
+          <div className="mt-4 text-center text-sm text-muted-foreground">
             Already have an account?{" "}
             <Link
               to="/login"
               state={{ from: location.state?.from }}
-              className="underline"
+              className="underline text-primary hover:text-primary/90 font-medium"
             >
               Sign in
             </Link>

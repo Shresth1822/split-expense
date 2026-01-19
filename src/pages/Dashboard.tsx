@@ -41,67 +41,68 @@ export function Dashboard() {
       </div>
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 p-8 text-white shadow-2xl">
-        <div className="relative z-10">
-          <p className="text-blue-100 font-medium mb-1">Total Balance</p>
-          <div className="flex items-center gap-4">
-            <h2 className="text-5xl font-bold tracking-tight">
-              {balance < 0 ? "-" : ""}₹{Math.abs(balance).toFixed(2)}
-            </h2>
+      {/* Hero Section */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-700 p-6 sm:p-8 text-white shadow-xl ring-1 ring-white/10">
+        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <p className="text-indigo-100 font-medium mb-1 flex items-center gap-2">
+              Total Balance
+            </p>
+            <div className="flex items-baseline gap-2">
+              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">
+                {balance < 0 ? "-" : ""}₹{Math.abs(balance).toFixed(2)}
+              </h2>
+            </div>
             {balance !== 0 && (
-              <span
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  balance > 0
-                    ? "bg-green-500/20 text-green-100 border border-green-500/30"
-                    : "bg-red-500/20 text-red-100 border border-red-500/30"
-                }`}
-              >
-                {balance > 0 ? "You are owed" : "You owe"}
-              </span>
+              <div className="mt-3 inline-flex">
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${
+                    balance > 0
+                      ? "bg-emerald-400/20 text-emerald-100 ring-1 ring-emerald-400/30"
+                      : "bg-rose-400/20 text-rose-100 ring-1 ring-rose-400/30"
+                  }`}
+                >
+                  {balance > 0 ? "You are owed" : "You owe"}
+                </span>
+              </div>
             )}
           </div>
         </div>
         {/* Abstract Background Shapes */}
-        <div className="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 h-64 w-64 rounded-full bg-black/10 blur-3xl"></div>
+        <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-indigo-400/20 blur-3xl"></div>
+        <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-violet-400/20 blur-3xl"></div>
       </div>
 
       {/* Quick Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="bg-card/50 border-destructive/20 shadow-sm hover:bg-card/80 transition-colors">
+      <div className="grid grid-cols-2 gap-4 sm:gap-6">
+        <Card className="bg-card/40 backdrop-blur-sm border-destructive/10 shadow-lg hover:shadow-destructive/5 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-destructive">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wider">
               You owe
             </CardTitle>
-            <ArrowDownLeft className="h-4 w-4 text-destructive" />
+            <div className="p-2 bg-destructive/10 rounded-full">
+              <ArrowDownLeft className="h-4 w-4 text-destructive" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-destructive">
+            <div className="text-2xl sm:text-3xl font-bold text-destructive">
               ₹{totalOwe.toFixed(2)}
-            </div>
-            <div className="mt-4 flex justify-end">
-              <div className="h-8 w-8 rounded-full bg-destructive/10 flex items-center justify-center">
-                <ArrowDownLeft className="h-4 w-4 text-destructive" />
-              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card/50 border-green-500/20 shadow-sm hover:bg-card/80 transition-colors">
+        <Card className="bg-card/40 backdrop-blur-sm border-emerald-500/10 shadow-lg hover:shadow-emerald-500/5 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-500">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wider">
               You are owed
             </CardTitle>
-            <ArrowUpRight className="h-4 w-4 text-green-500" />
+            <div className="p-2 bg-emerald-500/10 rounded-full">
+              <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-500">
+            <div className="text-2xl sm:text-3xl font-bold text-emerald-500">
               ₹{totalOwed.toFixed(2)}
-            </div>
-            <div className="mt-4 flex justify-end">
-              <div className="h-8 w-8 rounded-full bg-green-500/10 flex items-center justify-center">
-                <ArrowUpRight className="h-4 w-4 text-green-500" />
-              </div>
             </div>
           </CardContent>
         </Card>

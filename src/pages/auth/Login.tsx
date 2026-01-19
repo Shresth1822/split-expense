@@ -117,25 +117,44 @@ export function Login() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background">
-        <div className="mx-auto grid w-[350px] gap-6">
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background relative overflow-hidden">
+        {/* Mobile Background Elements */}
+        <div className="absolute top-0 right-0 -mr-24 -mt-24 h-64 w-64 rounded-full bg-primary/5 blur-3xl lg:hidden"></div>
+        <div className="absolute bottom-0 left-0 -ml-24 -mb-24 h-64 w-64 rounded-full bg-indigo-500/5 blur-3xl lg:hidden"></div>
+
+        <div className="mx-auto grid w-[350px] gap-6 relative z-10">
+          {/* Mobile Branding */}
+          <div className="flex flex-col items-center gap-2 mb-2 lg:hidden">
+            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center shadow-lg shadow-primary/20">
+              <img
+                src="/splitify-logo.png"
+                alt="Logo"
+                className="h-8 w-8 object-contain invert brightness-0"
+              />
+            </div>
+            <span className="text-xl font-bold tracking-tight">Splitify</span>
+          </div>
+
           <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold">Welcome back</h1>
-            <p className="text-balance text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              Welcome back
+            </h1>
+            <p className="text-balance text-muted-foreground text-sm sm:text-base">
               Enter your email below to login to your account
             </p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+            {/* ... form content ... */}
             {error && (
-              <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive font-medium border border-destructive/20">
                 {error}
                 {(error.includes("Email not confirmed") ||
                   error.includes("Invalid login credentials")) && (
                   <Button
                     type="button"
                     variant="link"
-                    className="p-0 h-auto font-normal text-destructive underline ml-1 align-baseline"
+                    className="p-0 h-auto font-semibold text-destructive underline ml-1 align-baseline"
                     onClick={handleResendVerification}
                     disabled={resendCooldown > 0}
                   >
@@ -153,9 +172,12 @@ export function Login() {
                 type="email"
                 placeholder="m@example.com"
                 {...register("email")}
+                className="bg-card w-full"
               />
               {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
+                <p className="text-xs text-destructive font-medium">
+                  {errors.email.message}
+                </p>
               )}
             </div>
             <div className="grid gap-2">
@@ -163,31 +185,37 @@ export function Login() {
                 <Label htmlFor="password">Password</Label>
                 <Link
                   to="/forgot-password"
-                  className="ml-auto inline-block text-sm underline"
+                  className="ml-auto inline-block text-xs text-primary hover:underline font-medium"
                 >
-                  Forgot your password?
+                  Forgot password?
                 </Link>
               </div>
-              <Input id="password" type="password" {...register("password")} />
+              <Input
+                id="password"
+                type="password"
+                {...register("password")}
+                className="bg-card w-full"
+              />
               {errors.password && (
-                <p className="text-sm text-red-500">
+                <p className="text-xs text-destructive font-medium">
                   {errors.password.message}
                 </p>
               )}
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-600/90 transition-all duration-300 shadow-md shadow-primary/20"
+              disabled={isLoading}
+            >
               {isLoading ? "Logging in..." : "Login"}
             </Button>
-            <Button variant="outline" className="w-full">
-              Login with Google
-            </Button>
           </form>
-          <div className="mt-4 text-center text-sm">
+          <div className="mt-4 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link
               to="/register"
               state={{ from: location.state?.from }}
-              className="underline"
+              className="underline text-primary hover:text-primary/90 font-medium"
             >
               Sign up
             </Link>
