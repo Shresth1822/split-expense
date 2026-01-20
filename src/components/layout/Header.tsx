@@ -14,6 +14,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Menu, Plus, User, LogOut } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { InstallPWA } from "@/components/pwa/InstallPWA";
 
 export function Header() {
   const { user, signOut } = useAuth();
@@ -63,6 +64,7 @@ export function Header() {
 
         {/* Right Actions */}
         <div className="flex items-center gap-4">
+          <InstallPWA className="hidden sm:flex" />
           <Link to="/groups">
             <Button size="sm" className="hidden sm:flex gap-2">
               <Plus className="h-4 w-4" /> Add Expense
@@ -136,7 +138,11 @@ export function Header() {
                     {item.label}
                   </Link>
                 ))}
-                <div className="border-t pt-4">
+                <div className="border-t pt-4 space-y-4">
+                  <InstallPWA
+                    className="w-full justify-start"
+                    variant="secondary"
+                  />
                   <Link to="/groups" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button className="w-full justify-start gap-2">
                       <Plus className="h-4 w-4" /> Add Expense
