@@ -103,7 +103,7 @@ export function EditExpense({
       const totalAmount = expenseData.expense.amount;
       const numSplits = expenseData.splits?.length || 0;
       const isRoughlyEqual = expenseData.splits?.every(
-        (s) => Math.abs(s.amount - totalAmount / numSplits) < 0.05
+        (s) => Math.abs(s.amount - totalAmount / numSplits) < 0.05,
       );
 
       if (isRoughlyEqual && numSplits === members.length) {
@@ -141,7 +141,7 @@ export function EditExpense({
         data.amount,
         members,
         data.splitType,
-        splitDetails
+        splitDetails,
       );
 
       // 3. Replace Splits (Delete All + Insert New)
@@ -162,7 +162,7 @@ export function EditExpense({
             user_id: s.userId,
             amount: s.amount,
             owed_to: data.paidBy,
-          }))
+          })),
         );
 
       if (insertError) throw insertError;
@@ -189,7 +189,7 @@ export function EditExpense({
     amount: number,
     members: (GroupMember & { profiles: Profile })[],
     type: string,
-    details: Record<string, number>
+    details: Record<string, number>,
   ) => {
     if (type === "equal") {
       const splitAmount = amount / members.length;
@@ -254,6 +254,17 @@ export function EditExpense({
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="date" className="text-right">
+                  Date
+                </Label>
+                <Input
+                  id="date"
+                  type="date"
+                  className="col-span-3"
+                  {...register("date")}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="paidBy" className="text-right">
                   Paid By
                 </Label>
@@ -284,7 +295,7 @@ export function EditExpense({
                   onValueChange={(val) => {
                     setValue(
                       "splitType",
-                      val as "equal" | "exact" | "percentage"
+                      val as "equal" | "exact" | "percentage",
                     );
                     // Don't clear splitDetails here on edit, maybe user wants to switch back
                   }}

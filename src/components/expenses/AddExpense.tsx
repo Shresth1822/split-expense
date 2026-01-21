@@ -81,7 +81,7 @@ export function AddExpense({ groupId, members }: AddExpenseProps) {
         members,
         data.splitType,
         splitDetails,
-        data.paidBy
+        data.paidBy,
       );
 
       // 3. Insert Splits
@@ -93,7 +93,7 @@ export function AddExpense({ groupId, members }: AddExpenseProps) {
             user_id: s.userId,
             amount: s.amount,
             owed_to: data.paidBy, // Simple model: everyone owes the payer
-          }))
+          })),
         );
 
       if (splitError) throw splitError;
@@ -119,7 +119,7 @@ export function AddExpense({ groupId, members }: AddExpenseProps) {
     members: (GroupMember & { profiles: Profile })[],
     type: string,
     details: Record<string, number>,
-    _payerId: string
+    _payerId: string,
   ) => {
     if (type === "equal") {
       const splitAmount = amount / members.length;
@@ -183,6 +183,17 @@ export function AddExpense({ groupId, members }: AddExpenseProps) {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="date" className="text-right">
+                Date
+              </Label>
+              <Input
+                id="date"
+                type="date"
+                className="col-span-3"
+                {...register("date")}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="paidBy" className="text-right">
                 Paid By
               </Label>
@@ -212,7 +223,7 @@ export function AddExpense({ groupId, members }: AddExpenseProps) {
                 onValueChange={(val) => {
                   setValue(
                     "splitType",
-                    val as "equal" | "exact" | "percentage"
+                    val as "equal" | "exact" | "percentage",
                   );
                   setSplitDetails({});
                 }}
