@@ -14,7 +14,6 @@ import {
   Users,
   Wallet,
   Receipt,
-  Download,
   ShieldCheck,
   Zap,
   Globe,
