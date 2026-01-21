@@ -27,6 +27,7 @@ import { FAQ } from "./pages/static/FAQ";
 import { PrivacyPolicy } from "./pages/static/PrivacyPolicy";
 import { TermsOfService } from "./pages/static/TermsOfService";
 import { CookiePolicy } from "./pages/static/CookiePolicy";
+import { LandingPage } from "./pages/LandingPage";
 
 function App() {
   return (
@@ -40,23 +41,27 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/update-password" element={<UpdatePassword />} />
 
+              {/* Public Routes */}
+              <Route path="/" element={<LandingPage />} />
+              <Route element={<AppLayout />}>
+                {/* Layout for static pages (header/footer) but public */}
+                <Route path="/features" element={<Features />} />
+                <Route path="/how-it-works" element={<HowItWorks />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<TermsOfService />} />
+                <Route path="/cookie-policy" element={<CookiePolicy />} />
+              </Route>
+
               <Route element={<ProtectedRoute />}>
                 <Route element={<AppLayout />}>
                   {/* ... protected routes ... */}
-                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/groups" element={<Groups />} />
                   <Route path="/groups/:id" element={<GroupDetails />} />
                   <Route path="/friends" element={<Friends />} />
                   <Route path="/activity" element={<Activity />} />
                   <Route path="/profile" element={<Profile />} />
-
-                  {/* Static Pages */}
-                  <Route path="/features" element={<Features />} />
-                  <Route path="/how-it-works" element={<HowItWorks />} />
-                  <Route path="/faq" element={<FAQ />} />
-                  <Route path="/privacy" element={<PrivacyPolicy />} />
-                  <Route path="/terms" element={<TermsOfService />} />
-                  <Route path="/cookie-policy" element={<CookiePolicy />} />
                 </Route>
                 <Route path="/join/:groupId" element={<JoinGroup />} />
               </Route>
