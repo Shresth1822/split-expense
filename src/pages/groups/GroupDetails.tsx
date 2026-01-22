@@ -329,14 +329,20 @@ export function GroupDetails() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
-                                onClick={() => setEditingExpense(expense.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingExpense(expense.id);
+                                }}
                                 className="cursor-pointer"
                               >
                                 Edit Expense
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="text-destructive focus:text-destructive cursor-pointer"
-                                onClick={() => deleteExpense.mutate(expense.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteExpense.mutate(expense.id);
+                                }}
                               >
                                 Delete Expense
                               </DropdownMenuItem>
