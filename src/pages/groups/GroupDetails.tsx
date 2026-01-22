@@ -303,7 +303,7 @@ export function GroupDetails() {
                                 </Button>
                               </SheetTrigger>
                             </div>
-                            <SheetContent>
+                            <SheetContent onClick={(e) => e.stopPropagation()}>
                               <SheetHeader>
                                 <SheetTitle>Comments</SheetTitle>
                                 <SheetDescription>
