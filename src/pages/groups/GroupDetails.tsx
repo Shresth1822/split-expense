@@ -291,17 +291,18 @@ export function GroupDetails() {
 
                         <div className="flex items-center gap-2">
                           <Sheet>
-                            <SheetTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-9 w-9 p-0 rounded-full hover:bg-primary/10 hover:text-primary transition-colors z-10 relative"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <MessageSquare className="h-4 w-4" />
-                                <span className="sr-only">Comments</span>
-                              </Button>
-                            </SheetTrigger>
+                            <div onClick={(e) => e.stopPropagation()}>
+                              <SheetTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-9 w-9 p-0 rounded-full hover:bg-primary/10 hover:text-primary transition-colors z-10 relative"
+                                >
+                                  <MessageSquare className="h-4 w-4" />
+                                  <span className="sr-only">Comments</span>
+                                </Button>
+                              </SheetTrigger>
+                            </div>
                             <SheetContent>
                               <SheetHeader>
                                 <SheetTitle>Comments</SheetTitle>
