@@ -40,6 +40,7 @@ import {
 import { EditExpense } from "@/components/expenses/EditExpense";
 import { useAuth } from "@/context/AuthContext";
 import { GroupSettingsDialog } from "@/components/groups/GroupSettingsDialog";
+import { ExpenseDetailsDialog } from "@/components/expenses/ExpenseDetailsDialog";
 
 type GroupDetails = Group & {
   group_members: (GroupMember & {
@@ -55,6 +56,7 @@ export function GroupDetails() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [editingExpense, setEditingExpense] = useState<string | null>(null);
+  const [viewingExpense, setViewingExpense] = useState<string | null>(null);
 
   const { data: friends } = useFriends();
 
@@ -75,7 +77,7 @@ export function GroupDetails() {
             *,
             profiles:paid_by (*)
           )
-        `
+        `,
         )
         .eq("id", id)
         .order("date", { foreignTable: "expenses", ascending: false })
@@ -182,7 +184,7 @@ export function GroupDetails() {
   const availableFriends = friends?.filter(
     (friend) =>
       !group.group_members.some((member) => member.user_id === friend.id) &&
-      friend.status === "accepted"
+      friend.status === "accepted",
   );
 
   return (
@@ -249,7 +251,8 @@ export function GroupDetails() {
                   {group.expenses.map((expense) => (
                     <div
                       key={expense.id}
-                      className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border bg-card hover:border-primary/50 transition-all duration-200 shadow-sm"
+                      className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border bg-card hover:border-primary/50 transition-all duration-200 shadow-sm cursor-pointer hover:shadow-md"
+                      onClick={() => setViewingExpense(expense.id)}
                     >
                       <div className="flex items-center gap-4">
                         <div className="h-12 w-12 rounded-xl bg-primary/10 flex flex-col items-center justify-center text-primary border border-primary/20">
@@ -292,7 +295,8 @@ export function GroupDetails() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-9 w-9 p-0 rounded-full hover:bg-primary/10 hover:text-primary transition-colors"
+                                className="h-9 w-9 p-0 rounded-full hover:bg-primary/10 hover:text-primary transition-colors z-10 relative"
+                                onClick={(e) => e.stopPropagation()}
                               >
                                 <MessageSquare className="h-4 w-4" />
                                 <span className="sr-only">Comments</span>
@@ -317,7 +321,8 @@ export function GroupDetails() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-9 w-9 p-0 rounded-full"
+                                className="h-9 w-9 p-0 rounded-full z-10 relative"
+                                onClick={(e) => e.stopPropagation()}
                               >
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
@@ -385,7 +390,7 @@ export function GroupDetails() {
               <div className="space-y-3">
                 {group.group_members.map((member) => {
                   const friendStatus = friends?.find(
-                    (f) => f.id === member.user_id
+                    (f) => f.id === member.user_id,
                   )?.status;
 
                   const isMe = member.user_id === user?.id;
@@ -499,6 +504,13 @@ export function GroupDetails() {
           onClose={() => setEditingExpense(null)}
         />
       )}
+
+      {/* View Expense Modal */}
+      <ExpenseDetailsDialog
+        expenseId={viewingExpense}
+        isOpen={!!viewingExpense}
+        onClose={() => setViewingExpense(null)}
+      />
     </div>
   );
 }
