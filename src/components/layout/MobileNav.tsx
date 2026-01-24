@@ -1,4 +1,4 @@
-import { Home, Users, Wallet, User } from "lucide-react";
+import { Home, Users, User, Handshake } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +9,7 @@ export function MobileNav() {
     { href: "/", icon: Home, label: "Home" },
     { href: "/groups", icon: Users, label: "Groups" },
     // { href: "/groups/new", icon: Plus, label: "New", isFab: true }, // Optional FAB styled item
-    { href: "/friends", icon: Wallet, label: "Friends" },
+    { href: "/friends", icon: Handshake, label: "Friends" },
     { href: "/profile", icon: User, label: "Profile" },
   ];
 
