@@ -186,7 +186,7 @@ export function Dashboard() {
                         >
                           ₹{Math.abs(debt.totalAmount).toFixed(2)}
                         </span>
-                        {debt.totalAmount > 0 && (
+                        {debt.totalAmount !== 0 && (
                           <Button
                             size="sm"
                             variant="outline"
