@@ -24,6 +24,7 @@ export function Header() {
   const navItems = [
     { label: "Dashboard", href: "/" },
     { label: "Groups", href: "/groups" },
+    { label: "Reports", href: "/reports" },
     { label: "Friends", href: "/friends" },
     // { label: "Activity", href: "/activity" }, // Assuming activity page exists or will be created
   ];
