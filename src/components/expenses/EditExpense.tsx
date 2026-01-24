@@ -289,6 +289,30 @@ export function EditExpense({
                   </SelectContent>
                 </Select>
               </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="category" className="text-right">
+                  Category
+                </Label>
+                <Select
+                  onValueChange={(val) => setValue("category", val)}
+                  defaultValue={watch("category") || "General"}
+                  value={watch("category")}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="General">General</SelectItem>
+                    <SelectItem value="Food">Food</SelectItem>
+                    <SelectItem value="Transport">Transport</SelectItem>
+                    <SelectItem value="Utilities">Utilities</SelectItem>
+                    <SelectItem value="Entertainment">Entertainment</SelectItem>
+                    <SelectItem value="Health">Health</SelectItem>
+                    <SelectItem value="Shopping">Shopping</SelectItem>
+                    <SelectItem value="Travel">Travel</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
               {/* Split Type Selector */}
               <div className="grid grid-cols-4 items-center gap-4">
