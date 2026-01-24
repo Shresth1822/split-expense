@@ -31,6 +31,7 @@ const expenseSchema = z.object({
   amount: z.coerce.number().min(0.01, "Amount must be greater than 0"),
   date: z.string(),
   paidBy: z.string(),
+  category: z.string().min(1, "Category is required"),
   splitType: z.enum(["equal", "exact", "percentage"]),
 });
 
@@ -53,6 +54,7 @@ export function AddExpense({ groupId, members }: AddExpenseProps) {
       defaultValues: {
         date: new Date().toISOString().split("T")[0],
         paidBy: user?.id,
+        category: "General",
         splitType: "equal",
       },
     });
@@ -68,6 +70,7 @@ export function AddExpense({ groupId, members }: AddExpenseProps) {
           amount: data.amount,
           date: data.date,
           paid_by: data.paidBy,
+          category: data.category,
           created_by: user?.id,
         })
         .select()

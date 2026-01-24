@@ -18,6 +18,7 @@ import { Groups } from "./pages/groups/Groups";
 import { GroupDetails } from "./pages/groups/GroupDetails";
 import { JoinGroup } from "./pages/groups/JoinGroup";
 import { Friends } from "./pages/friends/Friends";
+import { Reports } from "@/pages/Reports";
 import { Activity } from "./pages/Activity";
 import { Profile } from "./pages/settings/Profile";
 
@@ -60,6 +61,7 @@ function App() {
                   <Route path="/groups" element={<Groups />} />
                   <Route path="/groups/:id" element={<GroupDetails />} />
                   <Route path="/friends" element={<Friends />} />
+                  <Route path="/reports" element={<Reports />} />
                   <Route path="/activity" element={<Activity />} />
                   <Route path="/profile" element={<Profile />} />
                 </Route>

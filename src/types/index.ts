@@ -23,6 +23,7 @@ export type Expense = {
   id: string;
   group_id: string;
   paid_by: string;
+  category: string; // Added category
   description: string;
   amount: number;
   date: string;

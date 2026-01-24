@@ -30,6 +30,7 @@ const expenseSchema = z.object({
   amount: z.coerce.number().min(0.01, "Amount must be greater than 0"),
   date: z.string(),
   paidBy: z.string(),
+  category: z.string().min(1, "Category is required"),
   splitType: z.enum(["equal", "exact", "percentage"]),
 });
 
@@ -57,6 +58,7 @@ export function EditExpense({
     resolver: zodResolver(expenseSchema) as any,
     defaultValues: {
       date: new Date().toISOString().split("T")[0],
+      category: "General",
       splitType: "equal",
     },
   });
@@ -94,6 +96,7 @@ export function EditExpense({
       setValue("amount", expenseData.expense.amount);
       setValue("date", expenseData.expense.date.split("T")[0]);
       setValue("paidBy", expenseData.expense.paid_by);
+      setValue("category", expenseData.expense.category || "General");
 
       // Determine Split Type Logic (simplified inference)
       // This is tricky because we don't store "splitType" in DB.
@@ -131,6 +134,7 @@ export function EditExpense({
           amount: data.amount,
           date: data.date,
           paid_by: data.paidBy,
+          category: data.category,
         })
         .eq("id", expenseId);
 
