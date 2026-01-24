@@ -198,9 +198,8 @@ export function Reports() {
                   />
                   <Bar
                     dataKey="amount"
-                    fill="currentColor"
+                    fill="#8b5cf6"
                     radius={[4, 4, 0, 0]}
-                    className="fill-primary"
                     barSize={40}
                   />
                 </BarChart>
