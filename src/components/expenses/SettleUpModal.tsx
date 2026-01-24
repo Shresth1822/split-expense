@@ -34,7 +34,7 @@ export function SettleUpModal({
 
   // Initialize amount when modal opens
   if (isOpen && debtItem && amount === "") {
-    setAmount(debtItem.totalAmount.toFixed(2));
+    setAmount(Math.abs(debtItem.totalAmount).toFixed(2));
   }
 
   /*
@@ -54,12 +54,22 @@ export function SettleUpModal({
         throw new Error("Invalid amount");
       }
 
+      // Determine Direction
+      // If debtItem.totalAmount > 0 => I owe them. I pay.
+      // If debtItem.totalAmount < 0 => They owe me. They pay.
+      // We use Math.abs(amount) because amount input should be positive.
+
+      const isIOweThem = debtItem.totalAmount > 0;
+      const payerId = isIOweThem ? user.id : debtItem.owedTo.id;
+      const splitUserId = isIOweThem ? debtItem.owedTo.id : user.id;
+      const splitOwedTo = isIOweThem ? user.id : debtItem.owedTo.id;
+
       // 1. Create Expense ("Settlement") - No Group ID
       const { data: expenseData, error: expenseError } = await supabase
         .from("expenses")
         .insert({
           // group_id is intentionally omitted (NULL) so it doesn't appear in group feeds
-          paid_by: user.id,
+          paid_by: payerId,
           description: "Settlement",
           amount: settleAmount,
           created_by: user.id,
@@ -70,15 +80,16 @@ export function SettleUpModal({
 
       if (expenseError) throw expenseError;
 
-      // 2. Create Split (100% to the friend)
-      // If I pay $50 to settle, it's effectively an expense where the friend "consumed" $50.
+      // 2. Create Split
+      // If I pay them: Split is assigned to Friend (userid), Owed To Me.
+      // If They pay me: Split is assigned to Me (userid), Owed To Them.
       const { error: splitError } = await supabase
         .from("expense_splits")
         .insert({
           expense_id: expenseData.id,
-          user_id: debtItem.owedTo.id, // friend
+          user_id: splitUserId,
           amount: settleAmount,
-          owed_to: user.id, // I paid, so they owe me (cancelling out the debt)
+          owed_to: splitOwedTo,
         });
 
       if (splitError) throw splitError;
@@ -108,13 +119,25 @@ export function SettleUpModal({
 
   if (!debtItem) return null;
 
+  const isIOweThem = debtItem.totalAmount > 0;
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Settle Up</DialogTitle>
+          <DialogTitle>{isIOweThem ? "Settle Up" : "Mark as Paid"}</DialogTitle>
           <DialogDescription>
-            Record a payment to <strong>{debtItem.owedTo.full_name}</strong>.
+            {isIOweThem ? (
+              <>
+                Record a payment to <strong>{debtItem.owedTo.full_name}</strong>
+                .
+              </>
+            ) : (
+              <>
+                Confirm that <strong>{debtItem.owedTo.full_name}</strong> paid
+                you.
+              </>
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -135,7 +158,6 @@ export function SettleUpModal({
               />
             </div>
           </div>
-          {/* Warning removed as group_id is no longer required */}
         </div>
 
         <DialogFooter>
@@ -144,7 +166,7 @@ export function SettleUpModal({
           </Button>
           <Button onClick={handleSettle} disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Record Payment
+            {isIOweThem ? "Record Payment" : "Confirm Receipt"}
           </Button>
         </DialogFooter>
       </DialogContent>

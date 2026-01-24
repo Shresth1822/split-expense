@@ -193,7 +193,9 @@ export function Dashboard() {
                             className="h-6 text-xs px-2"
                             onClick={() => setSettleUpTarget(debt)}
                           >
-                            Settle Up
+                            {debt.totalAmount > 0
+                              ? "Settle Up"
+                              : "Mark as Paid"}
                           </Button>
                         )}
                       </div>
