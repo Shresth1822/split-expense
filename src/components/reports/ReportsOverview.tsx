@@ -129,7 +129,9 @@ export function ReportsOverview({ expenses }: { expenses: any[] }) {
                       />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(val: number) => `₹${val.toFixed(2)}`} />
+                  <Tooltip
+                    formatter={(val: any) => `₹${Number(val).toFixed(2)}`}
+                  />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
