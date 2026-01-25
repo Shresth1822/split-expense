@@ -176,6 +176,7 @@ export function EditExpense({
       queryClient.invalidateQueries({ queryKey: ["balances"] });
       queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
       queryClient.invalidateQueries({ queryKey: ["debts"] });
+      queryClient.invalidateQueries({ queryKey: ["report-data"] });
       toast.success("Expense updated successfully");
       onClose();
     },

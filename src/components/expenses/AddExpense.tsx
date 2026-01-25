@@ -106,6 +106,7 @@ export function AddExpense({ groupId, members }: AddExpenseProps) {
       queryClient.invalidateQueries({ queryKey: ["balances"] });
       queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
       queryClient.invalidateQueries({ queryKey: ["debts"] });
+      queryClient.invalidateQueries({ queryKey: ["report-data"] });
       setIsOpen(false);
       reset();
       setSplitDetails({});
