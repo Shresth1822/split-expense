@@ -126,6 +126,17 @@ export function ExpenseDetailsDialog({
                 </div>
               </div>
 
+              {/* Category Display */}
+              <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-lg mb-4">
+                <Tag className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-muted-foreground">
+                  Category:
+                </span>
+                <span className="text-sm font-bold ml-auto">
+                  {data.expense.category || "General"}
+                </span>
+              </div>
+
               <div className="space-y-3">
                 <div className="text-sm font-medium text-muted-foreground mb-2">
                   Split Breakdown
