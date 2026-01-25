@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, Receipt, Calendar, User } from "lucide-react";
+import { Loader2, Receipt, Calendar, User, Tag } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ExpenseDetailsDialogProps {
