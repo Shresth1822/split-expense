@@ -45,7 +45,9 @@ export function ReportsGroups({ expenses }: { expenses: any[] }) {
       {} as Record<string, { name: string; value: number; count: number }>,
     );
 
-    return Object.values(grouped).sort((a, b) => b.value - a.value);
+    return Object.values(grouped).sort(
+      (a: any, b: any) => b.value - a.value,
+    ) as { name: string; value: number; count: number }[];
   }, [expenses]);
 
   return (
@@ -78,11 +80,11 @@ export function ReportsGroups({ expenses }: { expenses: any[] }) {
                     tick={{ fontSize: 12 }}
                   />
                   <Tooltip
-                    formatter={(val: number) => `₹${val.toFixed(2)}`}
+                    formatter={(val: any) => `₹${Number(val).toFixed(2)}`}
                     cursor={{ fill: "transparent" }}
                   />
                   <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={32}>
-                    {groupStats.map((entry, index) => (
+                    {groupStats.map((_entry, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={COLORS[index % COLORS.length]}
@@ -102,24 +104,26 @@ export function ReportsGroups({ expenses }: { expenses: any[] }) {
 
       {/* Detailed List */}
       <div className="grid gap-4 md:grid-cols-1">
-        {groupStats.map((group) => (
-          <Card
-            key={group.name}
-            className="flex items-center justify-between p-4"
-          >
-            <div className="flex flex-col">
-              <span className="font-semibold">{group.name}</span>
-              <span className="text-xs text-muted-foreground">
-                {group.count} transactions
-              </span>
-            </div>
-            <div className="text-right">
-              <span className="font-bold text-lg">
-                ₹{group.value.toFixed(2)}
-              </span>
-            </div>
-          </Card>
-        ))}
+        {groupStats.map(
+          (group: { name: string; value: number; count: number }) => (
+            <Card
+              key={group.name}
+              className="flex items-center justify-between p-4"
+            >
+              <div className="flex flex-col">
+                <span className="font-semibold">{group.name}</span>
+                <span className="text-xs text-muted-foreground">
+                  {group.count} transactions
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="font-bold text-lg">
+                  ₹{group.value.toFixed(2)}
+                </span>
+              </div>
+            </Card>
+          ),
+        )}
       </div>
     </div>
   );

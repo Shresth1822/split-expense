@@ -1,12 +1,5 @@
 import { useMemo, useState } from "react";
-import {
-  format,
-  parseISO,
-  startOfMonth,
-  endOfMonth,
-  eachDayOfInterval,
-  isSameDay,
-} from "date-fns";
+import { format, parseISO, eachDayOfInterval } from "date-fns";
 import {
   AreaChart,
   Area,
@@ -131,7 +124,7 @@ export function ReportsTime({ expenses }: { expenses: any[] }) {
                   border: "none",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                 }}
-                formatter={(val: number) => `₹${val.toFixed(2)}`}
+                formatter={(val: any) => `₹${Number(val).toFixed(2)}`}
                 labelFormatter={(label) => label}
               />
               <Area
