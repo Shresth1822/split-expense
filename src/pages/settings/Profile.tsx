@@ -23,10 +23,10 @@ export function Profile() {
 
   // General Tab State
   const [fullName, setFullName] = useState(
-    user?.user_metadata?.full_name || ""
+    user?.user_metadata?.full_name || "",
   );
   const [preferredCurrency, setPreferredCurrency] = useState(
-    user?.user_metadata?.currency || "INR"
+    user?.user_metadata?.currency || "INR",
   );
 
   // Security Tab State
@@ -109,7 +109,7 @@ export function Profile() {
     const subject = "Join me on Splitify";
     const body = `Hey! I use Splitify to track expenses and settle debts. Join me here: ${window.location.origin}/register`;
     window.location.href = `mailto:${inviteEmail}?subject=${encodeURIComponent(
-      subject
+      subject,
     )}&body=${encodeURIComponent(body)}`;
     toast.success("Opening email client...");
     setInviteEmail("");
