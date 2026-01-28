@@ -16,9 +16,18 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Copy, Download, Trash2, Share2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 export function Profile() {
   const { user } = useAuth();
+  const {
+    isSubscribed,
+    subscribe,
+    unsubscribe,
+    loading: pushLoading,
+    permission,
+  } = usePushNotifications();
   const [loading, setLoading] = useState(false);
 
   // General Tab State
@@ -346,11 +355,32 @@ export function Profile() {
                 <div>
                   <p className="font-medium">Appearance</p>
                   <p className="text-sm text-muted-foreground">
-                    Togle between light and dark themes.
+                    Toggle between light and dark themes.
                   </p>
                 </div>
                 <ModeToggle />
               </div>
+              <div className="mt-4 flex items-center justify-between border-t pt-4">
+                <div className="space-y-0.5">
+                  <p className="font-medium">Push Notifications</p>
+                  <p className="text-sm text-muted-foreground">
+                    Receive alerts for new expenses.
+                  </p>
+                </div>
+                <Switch
+                  checked={isSubscribed}
+                  onCheckedChange={(checked) => {
+                    if (checked) subscribe();
+                    else unsubscribe();
+                  }}
+                  disabled={pushLoading}
+                />
+              </div>
+              {permission === "denied" && (
+                <p className="mt-2 text-xs text-destructive">
+                  ⚠️ Notifications are blocked in your browser settings.
+                </p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
